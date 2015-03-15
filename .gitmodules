@@ -1,0 +1,3 @@
+[submodule "Core/ajaxProcessUpdater"]
+	path = Core/ajaxProcessUpdater
+	url = https://github.com/manticorp/ajaxProcessUpdater.git
