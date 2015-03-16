@@ -257,11 +257,13 @@ EOF;
                 exit(1);
             }
             foreach ($cols as $i => &$col) {
-                $col = '    `' . $col . '` ';
+                $cname = $col;
+                $col = '    `' . $cname . '` ';
                 $col .= is_numeric($sl[$i]) ? "DECIMAL(12,6) DEFAULT NULL" :
                                                         "VARCHAR(512) DEFAULT NULL";
+                $col .= " COMMENT '$cname'";
             }
-            array_unshift($cols, '    `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY');
+            array_unshift($cols, '    `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT \'id\'');
         }
         $SQL = "CREATE TABLE IF NOT EXISTS `{$this->vars['db']['db']}`.`{$this->vars['db']['table']}` (\n";
         $SQL .= implode(",\n", $cols);
