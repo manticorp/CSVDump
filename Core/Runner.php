@@ -216,8 +216,6 @@ EOF;
 
         $this->executeSql($SQL);
 
-        rename($this->vars['ofn'], $this->vars['ofn'].'.bak');
-
         do {
             usleep(500);
             $this->state['ofh'] = @fopen($this->vars['ofn'], 'w');
