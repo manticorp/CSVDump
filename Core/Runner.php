@@ -112,7 +112,7 @@ EOF;
 
         switch($this->vars['method']){
             case 1:
-                $csv = CSVRunner::csvFileToArray($this->vars['ifn']);
+                $csv = self::csvFileToArray($this->vars['ifn']);
                 $i = 0;
                 $numLines = count($csv);
                 foreach($csv as $row){
@@ -215,6 +215,8 @@ EOF;
         }
 
         $this->executeSql($SQL);
+
+        rename($this->vars['ofn'], $this->vars['ofn'].'.bak');
 
         do {
             usleep(500);
@@ -495,8 +497,16 @@ EOF;
                 if($key % ($numHeaders-1) == 0 && $key !== 0 && $key !== $numRows-1){
                     $parts = explode("\n", $field);
                     if(count($parts) == 2){
-                        $tempCsv[] = trim($parts[0]);
-                        $tempCsv[] = trim($parts[1]);
+                        $nf = trim($parts[0]);
+                        if($nf[0] == '"' && $nf[strlen($nf)-1] == '"'){
+                            $nf = substr($nf, 1, strlen($nf)-2);
+                        }
+                        $tempCsv[] = trim($nf);
+                        $nf = trim($parts[1]);
+                        if($nf[0] == '"' && $nf[strlen($nf)-1] == '"'){
+                            $nf = substr($nf, 1, strlen($nf)-2);
+                        }
+                        $tempCsv[] = $nf;
                     }
                 } else {
                     $tempCsv[] = $field;
