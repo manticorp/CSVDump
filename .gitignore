@@ -10,4 +10,4 @@ input/*.csv
 Core/Processor/DB/*.php
 !Core/Processor/Row/Abstract.php
 !Core/Processor/Row/Example.php
-!Core/Processor/Row/*.php
+Core/Processor/Row/*.php
