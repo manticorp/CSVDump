@@ -28,7 +28,7 @@ then point your browser to:
 
 ### Basic usage
 
-1. Edit /Core/Config.php with your database details.
+1. Edit /Core/Config.example.php with your database details and save as Config.php.
 2. Place a CSV file in /CSVDump/input.
 3. Navigate to the [CSVDump directory](http://localhost/CSVDump) in your web browser.
 4. Type your database name
