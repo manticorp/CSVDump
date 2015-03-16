@@ -2,3 +2,6 @@ var/*
 *.sublime-project
 *.sublime-workspace
 Core/Config.php
+!input/test.csv
+!input/malformedFile.csv
+input/*.csv
