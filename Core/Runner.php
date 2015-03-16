@@ -129,7 +129,7 @@ EOF;
                         @flush();
 
                         $this->pu->setStageMessage("Processing Item $i / $numLines");
-                        $this->pu->incrementStageItems($chunks, true);
+                        $this->pu->incrementStageItems($this->vars['chunks'], true);
                     }
                     $mysqli = $this->getMysqli();
                     $row = array_map(function($a) use ($mysqli){ return $mysqli->real_escape_string($a);}, $row);

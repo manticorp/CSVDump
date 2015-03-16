@@ -83,11 +83,27 @@ else:
               <?php foreach ($processors as $p) printf("<option value=\"%s\">%s</option>\n", $p, $p); ?>
             </select>
           </label>
-          <div class="checkbox">
-            <label>
-              <input type="checkbox" checked value="" name="hh" id="inputHh" title="Whether your csv has headers">
-              Has Headers
-            </label>
+          <button class="btn btn-primary btn-small" type="button" data-toggle="collapse" data-target="#advancedOptions" aria-expanded="false" aria-controls="advancedOptions">
+            Advanced Options
+          </button>
+          <div class="collapse" id="advancedOptions">
+            <div class="well">
+              <label for="inputChunks">Chunks
+                <input type="number" name="chunks" id="inputChunks" class="form-control" value="1000" min="5" max="10000" step="1" title="Processing step size">
+              </label>
+              <div class="checkbox">
+                <label for="inputReplace">
+                  <input type="checkbox" checked value="" name="hh" id="inputReplace" title="Whether to replace existing data">
+                  Replace Data
+                </label>
+              </div>
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" checked value="" name="hh" id="inputHh" title="Whether your csv has headers">
+                  Has Headers
+                </label>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -187,13 +203,15 @@ $(function(){
         var table = $('#inputTable').val();
         var processor = $('#processor').val();
         var hh = $('#inputHh').is(":checked") ? 'true' : 'false';
+        var replace = $('#inputReplace').is(":checked") ? 'true' : 'false';
+        var chunks = $('#inputChunks').val();
         window.finished = false;
         $.getJSON('Core/App.php',
             {
               fn:fn,
-              replace:'true',
+              replace:replace,
               progressFn:window.progressFn,
-              chunks: 3000,
+              chunks: chunks,
               jp:jp,
               db:db,
               table:table,
