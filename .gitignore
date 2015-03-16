@@ -5,3 +5,9 @@ Core/Config.php
 !input/test.csv
 !input/malformedFile.csv
 input/*.csv
+!Core/Processor/DB/Abstract.php
+!Core/Processor/DB/Example.php
+Core/Processor/DB/*.php
+!Core/Processor/Row/Abstract.php
+!Core/Processor/Row/Example.php
+!Core/Processor/Row/*.php
