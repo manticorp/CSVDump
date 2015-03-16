@@ -1,50 +1,76 @@
-<?php
-
-include "./Core/Runner.php";
-
-$baseurl = explode('?', $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'])[0];
-
-$msg   = null;
-$error = false;
-if (isset($_GET['delete']) && isset($_GET['fn'])) {
-    if (file_exists($_GET['fn'])) {
-        unlink($_GET['fn']);
-        $msg = "File $_GET[fn] deleted";
-    } else {
-        $msg   = "File $_GET[fn] not found";
-        $error = true;
-    }
-}
-
-$processors = CSVRunner::getProcessors();
-?>
-
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Load CSV</title>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Load CSV</title>
 
-    <!-- Bootstrap CSS -->
-    <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+        <!-- Bootstrap CSS -->
+        <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
 
-    <style>#supports_html5_storage { padding: 6px; margin: 6px 0; border: 1px solid #aaa; color: red; display: none;}</style>
+        <style>
+        .warning { padding: 6px 6px 0 6px; margin: 6px 0; border: 1px solid #aaa; border-radius: 3px; color: red;}
+        #supports_html5_storage {display: none;}
+        .page-header { background: #333; margin: 0 auto 12px auto; padding-top: 12px; border-bottom: 4px solid #888;}
+        .page-header h1 { margin: 0; color: white; padding: 0; text-shadow: 2px 1px 2px rgba(0,0,0,0);}
+        h2 {maring: 8px auto;}
+        </style>
 
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
-  </head>
-  <body>
-    <div class="container">
-      <div class="row">
-        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-          <div id="supports_html5_storage">HTML5 Storage is not supported by your browser. Settings will not be saved.</div>
-          <h1>Input</h1>
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+          <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+    </head>
+    <body>
+        <div class="page-header">
+            <div class="container">
+                <h1>CSVDump <small>Dump CSV files into a MySQL Database</small></h1>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+<?php
+// Just check that our Config file exists and display a message otherwise
+if(!file_exists('./Core/Config.php')):
+    if(file_exists('./Core/Config.example.php')){
+        $msg = "<p>Edit <code>/Core/Config.example.php</code> with your database details and save as <code>/Core/Config.php</code>.</p>";
+    } else {
+        $msg = "<p>Also missing <code>/Core/Config.example.php</code>, please <a href='https://github.com/manticorp/CSVDump'>re-download the repository.</a></p>";
+    }
+?>
+                    <div class="warning" id="config_file_not_exists">
+                        <p>You are missing the /Core/Config.php file.</p>
+                        <?php echo $msg; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+<?php
+// Else display the interface
+else:
+    include "./Core/Runner.php";
+
+    $baseurl = explode('?', $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'])[0];
+
+    $msg   = null;
+    $error = false;
+    if (isset($_GET['delete']) && isset($_GET['fn'])) {
+        if (file_exists($_GET['fn'])) {
+            unlink($_GET['fn']);
+            $msg = "File $_GET[fn] deleted";
+        } else {
+            $msg   = "File $_GET[fn] not found";
+            $error = true;
+        }
+    }
+
+    $processors = CSVRunner::getProcessors();
+?>
+          <h2>Input</h2>
           <label for="inputDb">Database
             <input type="text" name="db"    id="inputDb"    class="form-control" value=""    title="" placeholder="e.g. test">
           </label>
@@ -326,6 +352,7 @@ function supports_html5_storage() {
   }
 }
     </script>
+<?php endif; ?>
 
     <!-- Bootstrap JavaScript -->
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
