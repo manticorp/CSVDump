@@ -32,7 +32,7 @@ then point your browser to:
 2. Place a CSV file in ```/CSVDump/input```.
 3. Navigate to the [CSVDump directory](http://localhost/CSVDump) in your web browser.
 4. Type your database name
-5. Click on 'Dump to database.tablename'
+5. Click on '**Dump to database.tablename**'
 
 ![Screenshot of basic screen](http://i.imgur.com/bCyOLBN.png)
 
