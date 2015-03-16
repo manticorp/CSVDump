@@ -131,6 +131,8 @@ EOF;
                         $this->pu->setStageMessage("Processing Item $i / $numLines");
                         $this->pu->incrementStageItems($chunks, true);
                     }
+                    $mysqli = $this->getMysqli();
+                    $row = array_map(function($a) use ($mysqli){ return $mysqli->real_escape_string($a);}, $row);
                     fwrite($this->getOutputFileHandle(), $this->processLine($row, $this->vars['method']));
                 }
                 $this->loadAndEmptyCSV(array_keys($row));
@@ -155,10 +157,10 @@ EOF;
                         }
                         fwrite($this->getOutputFileHandle(), $this->processLine($buffer, $this->vars['method']));
                     }
-                    if (!feof($infile)) {
+                    if (!feof($this->getInputFileHandle())) {
                         trigger_error('Error: Unexpected FGETS() fail.');
                     }
-                    fclose($infile);
+                    fclose($this->getInputFileHandle());
                 } else {
                     trigger_error("Failed to open $fn");
                 }

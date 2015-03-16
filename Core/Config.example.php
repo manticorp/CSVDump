@@ -12,11 +12,10 @@ $memoryLimit = '512M';  // Memory Limit for scripts to run - increase for large 
 $timezone    = 'UTC';   // Timezone
 $timeLimit   = 60*10;   // Time limit - increase for large inputs (default: 10 minutes)
 
+$vardir = APPLICATION_PATH . DIRECTORY_SEPARATOR;
 $puOptions = array(
     'lineBreak'   => "\n",
-    'filename'    => (isset($_GET['progressFn']) ? $_GET['progressFn'] : 'progress.json'),
+    'filename'    => (isset($_GET['progressFn']) ? $vardir . $_GET['progressFn'] : $vardir . 'progress.json'),
     'totalStages' => 3,
     'autocalc'    => true,
 );
-
-?>

@@ -180,6 +180,7 @@ $(function(){
       });
     });
     $('.process-file').click(function(){
+        $('#script-output').html("<h2>Processing...</h2>");
         var fn = $(this).data('fn');
         var jp = $(this).data('jp');
         var db = $('#inputDb').val();
@@ -262,6 +263,7 @@ function createAndInsertStatusBars(num){
 }
 
 function checkProgress(createStatusBars){
+    console.log('progress!');
     if(typeof createStatusBars === "undefined") createStatusBars = false;
     if(window.finished === true) return;
     url = window.progressFn;
