@@ -534,11 +534,16 @@ EOF;
     }
 
     /**
-     * Naively finds the delimiter in a file by string count, lol
+     * Naively finds the delimiter in a file by string count, or use Spl if it exists
      * @param  string $fn The file
      * @return string     The suspected delimiter
      */
     public static function findDelimiter($fn){
+        if(class_exists('SplFileObject')){
+            $file = new SplFileObject($fn);
+            $def = $file->getCsvControl();
+            return $def[0];
+        }
         $contents = file_get_contents($fn, null, null, 0, min(filesize($fn),64000));
         $occurences = array();
         foreach(self::$delimiters as $delim){
