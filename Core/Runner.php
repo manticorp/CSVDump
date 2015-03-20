@@ -22,6 +22,7 @@ class CSVRunner {
         'dbProcessor'   => false,
         'method'        => 1,
         'tableName'     => '',
+        'delimeter'     => false,
         'db' => array(
             'host'      => 'localhost',
             'user'      => 'root',
@@ -29,6 +30,10 @@ class CSVRunner {
             'db'        => '',
             'table'     => '',
         ),
+    );
+
+    public static $delimiters = array(
+        ';',',','|',':',"\t"
     );
 
     private $state = array(
@@ -61,7 +66,7 @@ class CSVRunner {
         $this->getMysqli();
 
         // Number of lines in the input file
-        $numLines = ($method = 1) ? count(CSVRunner::csvFileToArray($this->vars['ifn'])) : CSVRunner::numRowsInFile($this->vars['ifn']);
+        $numLines = ($method = 1) ? count(self::csvFileToArray($this->vars['ifn'], $this->vars['delimiter'])) : CSVRunner::numRowsInFile($this->vars['ifn']);
 
         $rowProcessor = $this->getProcessor($this->vars['rowProcessor']);
         $dbProcessor  = $this->getProcessor(
@@ -112,7 +117,7 @@ EOF;
 
         switch($this->vars['method']){
             case 1:
-                $csv = self::csvFileToArray($this->vars['ifn']);
+                $csv = self::csvFileToArray($this->vars['ifn'], $this->vars['delimiter']);
                 $i = 0;
                 $numLines = count($csv);
                 foreach($csv as $row){
@@ -184,7 +189,7 @@ EOF;
     private function processLine($line, $method = 1)
     {
         // return $line;
-        $line = ($method == 1) ? $line : str_getcsv($line);
+        $line = ($method == 1) ? $line : str_getcsv($line, $this->vars['delimiter']);
         return
         '"' .
         implode(
@@ -234,7 +239,7 @@ EOF;
         rewind($fh);
         $fl = fgets($fh);
         // Trim and htmlentities the first line of the file to make column names
-        $cols = array_map('trim', array_map('htmlentities', str_getcsv($fl)));
+        $cols = array_map('trim', array_map('htmlentities', str_getcsv($fl, $this->vars['delimiter'])));
         // array to hold definitions
         $defs = array();
         // if our table *doesn't* have headers, give generic names
@@ -250,7 +255,7 @@ EOF;
             }
         } else {
             // if our table *does* have headers
-            $sl = array_values(CSVRunner::csvFileToArray($this->vars['ifn'])[0]);
+            $sl = array_values(self::csvFileToArray($this->vars['ifn'])[0], $this->vars['delimiter']);
             if(count($sl) !== count($cols)){
                 $baseurl = explode('?', $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'])[0];
                 trigger_error("Number of columns inconsistent throughout file. For more information, see the error documentation.");
@@ -332,9 +337,10 @@ EOF;
         $this->vars['ifn'] = realpath($this->vars['ifn']);
 
         // Get a bunch of settings.
-        $this->vars['chunks']  = (isset($_GET["chunks"])) ? intval($_GET["chunks"]) : 1000;
-        $this->vars['limit']   = (isset($_GET["limit"])) ? intval($_GET["limit"]) : INF;
-        $this->vars['replace'] = (isset($_GET["replace"])) ? filter_var($_GET["replace"],FILTER_VALIDATE_BOOLEAN) : false;
+        $this->vars['chunks']    = (isset($_GET["chunks"])) ? intval($_GET["chunks"]) : 1000;
+        $this->vars['limit']     = (isset($_GET["limit"])) ? intval($_GET["limit"]) : INF;
+        $this->vars['replace']   = (isset($_GET["replace"])) ? filter_var($_GET["replace"],FILTER_VALIDATE_BOOLEAN) : false;
+        $this->vars['delimiter'] = (isset($_GET["delimiter"])) ? $_GET["delimiter"] : false;
         // has headers
         $this->vars['hh'] = (isset($_GET["hh"])) ? filter_var($_GET["hh"], FILTER_VALIDATE_BOOLEAN) :false;
         $this->vars['aa'] = (isset($_GET["aa"])) ? filter_var($_GET["aa"], FILTER_VALIDATE_BOOLEAN) :true;
@@ -482,16 +488,20 @@ EOF;
         if(!file_exists($filename) || !is_readable($filename))
             return FALSE;
 
+        if($delimiter === false){
+            $delimiter = self::findDelimiter($filename);
+        }
+
         $f = fopen($filename, 'r');
         $data = array();
         if (($handle = fopen($filename, 'r')) !== FALSE)
         {
             $line = fgets($f);
             fclose($f);
-            $header = str_getcsv($line);
+            $header = str_getcsv($line, $delimiter);
             $csv = file_get_contents($filename);
             $csv = substr($csv, strpos($csv, "\n")+1);
-            $csv = str_getcsv($csv);
+            $csv = str_getcsv($csv, $delimiter);
             $numHeaders = count($header);
             $tempCsv = array();
             $numRows = count($csv);
@@ -521,6 +531,27 @@ EOF;
             }, $csv);
         }
         return $csv;
+    }
+
+    /**
+     * Naively finds the delimiter in a file by string count, lol
+     * @param  string $fn The file
+     * @return string     The suspected delimiter
+     */
+    public static function findDelimiter($fn){
+        $contents = file_get_contents($fn, null, null, 0, min(filesize($fn),64000));
+        $occurences = array();
+        foreach(self::$delimiters as $delim){
+            $occurences[$delim] = 0;
+        }
+
+        foreach($occurences as $delim => &$count){
+            $count = substr_count($contents, $delim);
+        }
+        arsort($occurences);
+        $occurences = array_flip($occurences);
+        $delim = array_shift($occurences);
+        return $delim;
     }
 }
 
