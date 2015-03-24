@@ -76,7 +76,7 @@ class CSVRunner {
         $this->getMysqli();
 
         // Number of lines in the input file
-        $numLines = ($method = 1) ? count(self::csvFileToArray($this->vars['ifn'], $this->vars['delimiter'])) : CSVRunner::numRowsInFile($this->vars['ifn']);
+        $numLines = ($method = 1) ? count(self::csvFileToArray($this->vars['ifn'], $this->vars['delimiter'], $this->vars['quotechar'], $this->vars['escapechar'])) : CSVRunner::numRowsInFile($this->vars['ifn']);
 
         $rowProcessor = $this->getProcessor($this->vars['rowProcessor']);
         $dbProcessor  = $this->getProcessor(
@@ -127,7 +127,7 @@ EOF;
 
         switch($this->vars['method']){
             case 1:
-                $csv = self::csvFileToArray($this->vars['ifn'], $this->vars['delimiter']);
+                $csv = self::csvFileToArray($this->vars['ifn'], $this->vars['delimiter'], $this->vars['quotechar'], $this->vars['escapechar']);
                 $i = 0;
                 $numLines = count($csv);
                 foreach($csv as $row){
@@ -199,7 +199,7 @@ EOF;
     private function processLine($line, $method = 1)
     {
         // return $line;
-        $line = ($method == 1) ? $line : str_getcsv($line, $this->vars['delimiter']);
+        $line = ($method == 1) ? $line : str_getcsv($line, $this->vars['delimiter'], $this->vars['quotechar'], $this->vars['escapechar']);
         return
         '"' .
         implode(
@@ -249,7 +249,7 @@ EOF;
         rewind($fh);
         $fl = fgets($fh);
         // Trim and htmlentities the first line of the file to make column names
-        $cols = array_map('trim', array_map('htmlentities', str_getcsv($fl, $this->vars['delimiter'])));
+        $cols = array_map('trim', array_map('htmlentities', str_getcsv($fl, $this->vars['delimiter'], $this->vars['quotechar'], $this->vars['escapechar'])));
         // array to hold definitions
         $defs = array();
         // if our table *doesn't* have headers, give generic names
@@ -265,7 +265,7 @@ EOF;
             }
         } else {
             // if our table *does* have headers
-            $sl = array_values(self::csvFileToArray($this->vars['ifn'])[0], $this->vars['delimiter']);
+            $sl = array_values(self::csvFileToArray($this->vars['ifn'], $this->vars['delimiter'], $this->vars['quotechar'], $this->vars['escapechar'])[0]);
             if(count($sl) !== count($cols)){
                 $baseurl = explode('?', $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'])[0];
                 trigger_error("Number of columns inconsistent throughout file. For more information, see the error documentation.");
@@ -495,7 +495,7 @@ EOF;
         return $result;
     }
 
-    public static function csvFileToArray($filename='', $delimiter=',')
+    public static function csvFileToArray($filename='', $delimiter=',', $quotechar='"', $escapechar = '\\')
     {
         if(!file_exists($filename) || !is_readable($filename))
             return FALSE;
@@ -504,16 +504,20 @@ EOF;
             $delimiter = self::findDelimiter($filename);
         }
 
+        if($quotechar === false){
+            $quotechar = self::findQuoteChar($filename);
+        }
+
         $f = fopen($filename, 'r');
         $data = array();
         if (($handle = fopen($filename, 'r')) !== FALSE)
         {
             $line = fgets($f);
             fclose($f);
-            $header = str_getcsv($line, $delimiter);
+            $header = str_getcsv($line, $delimiter, $quotechar, $escapechar);
             $csv = file_get_contents($filename);
             $csv = substr($csv, strpos($csv, "\n")+1);
-            $csv = str_getcsv($csv, $delimiter);
+            $csv = str_getcsv($csv, $delimiter, $quotechar, $escapechar);
             $numHeaders = count($header);
             $tempCsv = array();
             $numRows = count($csv);

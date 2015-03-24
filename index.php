@@ -14,7 +14,9 @@
         #supports_html5_storage {display: none;}
         .page-header { background: #333; margin: 0 auto 12px auto; padding-top: 12px; border-bottom: 4px solid #888;}
         .page-header h1 { margin: 0; color: white; padding: 0; text-shadow: 2px 1px 2px rgba(0,0,0,0);}
+        #script-output {min-height: 120px; border-radius: 3px; border: 1px solid #888; padding: 6px; background: #002458; color: white; font-family: 'Consolas', 'Courier New', Courier, 'Lucida Sans Typewriter', 'Lucida Typewriter', monospace;;}
         h2 {maring: 8px auto;}
+        .blinking{-webkit-animation:1s blink step-end infinite;-moz-animation:1s blink step-end infinite;-ms-animation:1s blink step-end infinite;-o-animation:1s blink step-end infinite;animation:1s blink step-end infinite}@keyframes blink{from,to{color:transparent}50%{color:#fff}}@-moz-keyframes blink{from,to{color:transparent}50%{color:#fff}}@-webkit-keyframes blink{from,to{color:transparent}50%{color:#fff}}@-ms-keyframes "blink"{from,to{color:transparent}50%{color:#fff}}@-o-keyframes blink{from,to{color:transparent}50%{color:#fff}}
         </style>
 
         <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -171,7 +173,7 @@ else:
                       <span class="sr-only">0% Complete</span>
                     </div>
                   </div>
-              <div id="script-output"><em>Nothing to output</em></div>
+              <div id="script-output">Nothing to output<span id="typed-cursor" class="blinking">|</span></div>
           </div>
       </div>
     </div>
@@ -256,6 +258,7 @@ $(function(){
                     }
                     var d = new Date();
                     $output = $('<h4>Done! ' + d.toLocaleDateString() + ' ' + d.toLocaleTimeString() + '</h4>');
+                    $output.append('<span id="typed-cursor" class="blinking">|</span>');
                     $('#script-output').html($output);
                 }
             }
@@ -277,6 +280,7 @@ function displayError(data){
     if(typeof data.message !== 'undefined') msg = data.message;
     else if(typeof data.responseText !== 'undefined') msg = data.responseText;
     $output = $('<div class="alert alert-danger" role="alert"><strong>Oh no!</strong> Something went wrong, please try again.</div><p>Server message: <pre><code>'+msg+'</code></pre></p>');
+    $output.append('<span id="typed-cursor" class="blinking">|</span>');
     $('#script-output').html($output);
     return true;
 }
@@ -384,6 +388,8 @@ function updateDisplay(data){
         .attr('aria-valuenow', percentOfTotal)
         .css('width', percentOfTotal+"%");
     $('#tertiary-status-' + (data.stage.stageNum-1) +' span').text(Math.ceil(percentOfTotal*100)+"%");
+
+    $output.append('<span id="typed-cursor" class="blinking">|</span>');
 
     $('#script-output').html($output);
 }
