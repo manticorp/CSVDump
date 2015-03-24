@@ -23,6 +23,8 @@ class CSVRunner {
         'method'        => 1,
         'tableName'     => '',
         'delimeter'     => false,
+        'quotechar'     => false,
+        'escapechar'    => false,
         'db' => array(
             'host'      => 'localhost',
             'user'      => 'root',
@@ -33,7 +35,15 @@ class CSVRunner {
     );
 
     public static $delimiters = array(
-        ';',',','|',':',"\t"
+        ',',';','|',':',"\t"
+    );
+
+    public static $quoteChars = array(
+        '"','`',"'"
+    );
+
+    public static $escapeChars = array(
+        '\\','`',"'"
     );
 
     private $state = array(
@@ -337,10 +347,12 @@ EOF;
         $this->vars['ifn'] = realpath($this->vars['ifn']);
 
         // Get a bunch of settings.
-        $this->vars['chunks']    = (isset($_GET["chunks"])) ? intval($_GET["chunks"]) : 1000;
-        $this->vars['limit']     = (isset($_GET["limit"])) ? intval($_GET["limit"]) : INF;
-        $this->vars['replace']   = (isset($_GET["replace"])) ? filter_var($_GET["replace"],FILTER_VALIDATE_BOOLEAN) : false;
-        $this->vars['delimiter'] = (isset($_GET["delimiter"])) ? $_GET["delimiter"] : false;
+        $this->vars['chunks']     = (isset($_GET["chunks"])) ? intval($_GET["chunks"]) : 1000;
+        $this->vars['limit']      = (isset($_GET["limit"])) ? intval($_GET["limit"]) : INF;
+        $this->vars['replace']    = (isset($_GET["replace"])) ? filter_var($_GET["replace"],FILTER_VALIDATE_BOOLEAN) : false;
+        $this->vars['delimiter']  = (isset($_GET["delimiter"])  && $_GET["delimiter"]  !== '') ? $_GET["delimiter"]  : false;
+        $this->vars['quotechar']  = (isset($_GET["quotechar"])  && $_GET["quotechar"]  !== '') ? $_GET["quotechar"]  : false;
+        $this->vars['escapechar'] = (isset($_GET["escapechar"]) && $_GET["escapechar"] !== '') ? $_GET["escapechar"] : false;
         // has headers
         $this->vars['hh'] = (isset($_GET["hh"])) ? filter_var($_GET["hh"], FILTER_VALIDATE_BOOLEAN) :false;
         $this->vars['aa'] = (isset($_GET["aa"])) ? filter_var($_GET["aa"], FILTER_VALIDATE_BOOLEAN) :true;
@@ -557,6 +569,36 @@ EOF;
         $occurences = array_flip($occurences);
         $delim = array_shift($occurences);
         return $delim;
+    }
+
+    /**
+     * Naively finds the delimiter in a file by string count, or use Spl if it exists
+     * @param  string $fn The file
+     * @return string     The suspected delimiter
+     */
+    public static function findQuoteChar($fn){
+        if(class_exists('SplFileObject')){
+            $file = new SplFileObject($fn);
+            $def = $file->getCsvControl();
+            if(isset($def[1])){
+                return $def[1];
+            } else {
+                return '"';
+            }
+        }
+        $contents = file_get_contents($fn, null, null, 0, min(filesize($fn),64000));
+        $occurences = array();
+        foreach(self::$quotechars as $quote){
+            $occurences[$quote] = 0;
+        }
+
+        foreach($occurences as $quote => &$count){
+            $count = substr_count($contents, $quote);
+        }
+        arsort($occurences);
+        $occurences = array_flip($occurences);
+        $quote = array_shift($occurences);
+        return $quote;
     }
 }
 

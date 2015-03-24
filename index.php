@@ -89,7 +89,25 @@ else:
           <div class="collapse" id="advancedOptions">
             <div class="well">
               <label for="inputChunks">Chunks
-                <input type="number" name="chunks" id="inputChunks" class="form-control" value="1000" min="5" max="10000" step="1" title="Processing step size">
+                <input type="number" name="chunks" id="inputChunks" class="form-control" value="100" min="5" max="10000" step="1" title="Processing step size">
+              </label>
+              <label for="delimiter">Field Delimiter
+                <select name="delimiter" id="delimiter" class="form-control" required="required">
+                  <option value="">Auto Detect</option>
+                  <?php foreach (CSVRunner::$delimiters as $p) printf("<option value=\"%s\">%s</option>\n", $p, str_replace("\t","\\t",$p)); ?>
+                </select>
+              </label>
+              <label for="quotechar">Quote Char
+                <select name="quotechar" id="quotechar" class="form-control" required="required">
+                  <option value="">Auto Detect</option>
+                  <?php foreach (CSVRunner::$quoteChars as $p) printf("<option value=\"%s\">%s</option>\n", $p, str_replace("\t","\\t",$p)); ?>
+                </select>
+              </label>
+              <label for="escapechar">Escape Char
+                <select name="escapechar" id="escapechar" class="form-control" required="required">
+                  <option value="">Auto Detect</option>
+                  <?php foreach (CSVRunner::$escapeChars as $p) printf("<option value=\"%s\">%s</option>\n", $p, str_replace("\t","\\t",$p)); ?>
+                </select>
               </label>
               <div class="checkbox">
                 <label for="inputReplace">
@@ -205,6 +223,9 @@ $(function(){
         var hh = $('#inputHh').is(":checked") ? 'true' : 'false';
         var replace = $('#inputReplace').is(":checked") ? 'true' : 'false';
         var chunks = $('#inputChunks').val();
+        var delimiter = $('#delimiter').val();
+        var escapechar = $('#escapechar').val();
+        var quotechar = $('#quotechar').val();
         window.finished = false;
         $.getJSON('Core/App.php',
             {
@@ -216,7 +237,10 @@ $(function(){
               db:db,
               table:table,
               hh:hh,
-              processor:processor
+              processor:processor,
+              delimiter:delimiter,
+              escapechar:escapechar,
+              quotechar:quotechar
             },
             function(data){
                 console.log("ALL DONE", data);
