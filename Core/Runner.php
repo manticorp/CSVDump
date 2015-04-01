@@ -76,7 +76,7 @@ class CSVRunner {
         $this->getMysqli();
 
         // Number of lines in the input file
-        $numLines = ($method = 1) ? count(self::csvFileToArray($this->vars['ifn'], $this->vars['delimiter'], $this->vars['quotechar'], $this->vars['escapechar'])) : CSVRunner::numRowsInFile($this->vars['ifn']);
+        $numLines = ($method = 1) ? $this->numLines() : CSVRunner::numRowsInFile($this->vars['ifn']);
 
         $rowProcessor = $this->getProcessor($this->vars['rowProcessor']);
         $dbProcessor  = $this->getProcessor(
@@ -127,6 +127,26 @@ EOF;
 
         switch($this->vars['method']){
             case 1:
+                /*
+                $file = new SplFileObject($this->vars['ifn']);
+                $i = 0;
+                while (!$file->eof()) {
+                    $i++;
+                    if (($i === 1 & $this->vars['hh']) || $i > $this->vars['limit']) {
+                        continue;
+                    } elseif ($i % $this->vars['chunks'] === 0) {
+
+                        $this->loadAndEmptyCSV($columns);
+
+                        @ob_end_flush();
+                        @flush();
+
+                        $this->pu->setStageMessage("Processing Item $i / $numLines");
+                        $this->pu->incrementStageItems($chunks, true);
+                    }
+                    $csv = $file->fgetcsv($this->vars['delimiter'], $this->vars['quotechar'], $this->vars['escapechar']);
+                    fwrite($this->getOutputFileHandle(), $csv);
+                }*/
                 $csv = self::csvFileToArray($this->vars['ifn'], $this->vars['delimiter'], $this->vars['quotechar'], $this->vars['escapechar']);
                 $i = 0;
                 $numLines = count($csv);
@@ -147,13 +167,37 @@ EOF;
                         $this->pu->incrementStageItems($this->vars['chunks'], true);
                     }
                     $mysqli = $this->getMysqli();
+                    if(!is_array($row)){
+                        print_r($row);
+                        exit();
+                    }
                     $row = array_map(function($a) use ($mysqli){ return $mysqli->real_escape_string($a);}, $row);
-                    fwrite($this->getOutputFileHandle(), $this->processLine($row, $this->vars['method']));
+                    fwrite($this->getOutputFileHandle(), $this->processLine($row));
                 }
                 $this->loadAndEmptyCSV(array_keys($row));
                 break;
             case 2:
             default:
+                $file = new SplFileObject($this->vars['ifn']);
+                $i = 0;
+                while (!$file->eof()) {
+                    $i++;
+                    if (($i === 1 & $this->vars['hh']) || $i > $this->vars['limit']) {
+                        continue;
+                    } elseif ($i % $this->vars['chunks'] === 0) {
+
+                        $this->loadAndEmptyCSV($columns);
+
+                        @ob_end_flush();
+                        @flush();
+
+                        $this->pu->setStageMessage("Processing Item $i / $numLines");
+                        $this->pu->incrementStageItems($this->vars['chunks'], true);
+                    }
+                    $csv = $file->fgetcsv($this->vars['delimiter'], $this->vars['quotechar'], $this->vars['escapechar']);
+                    fwrite($this->getOutputFileHandle(), $this->processLine($csv));
+                }
+                /*
                 if ($this->getInputFileHandle()) {
                     $i = 0;
                     while (($buffer = fgets($infile)) !== false) {
@@ -179,6 +223,7 @@ EOF;
                 } else {
                     trigger_error("Failed to open $fn");
                 }
+                */
                 $this->loadAndEmptyCSV($columns);
                 break;
         }
@@ -196,10 +241,8 @@ EOF;
         return $this;
     }
 
-    private function processLine($line, $method = 1)
+    private function processLine($line)
     {
-        // return $line;
-        $line = ($method == 1) ? $line : str_getcsv($line, $this->vars['delimiter'], $this->vars['quotechar'], $this->vars['escapechar']);
         return
         '"' .
         implode(
@@ -257,7 +300,7 @@ EOF;
             $oc   = $cols;
             $c    = count($cols);
             $cols = array();
-            for ($i = 1; $i <= $c; $i++) {
+            for ($i = 0; $i < $c; $i++) {
                 $col = "    `Column_" . $i . "` ";
                 $col .= is_numeric($oc[$i]) ? "DECIMAL(12,6) DEFAULT NULL" :
                                                        "VARCHAR(512) DEFAULT NULL";
@@ -265,7 +308,9 @@ EOF;
             }
         } else {
             // if our table *does* have headers
-            $sl = array_values(self::csvFileToArray($this->vars['ifn'], $this->vars['delimiter'], $this->vars['quotechar'], $this->vars['escapechar'])[0]);
+            $file = new SplFileObject($this->vars['ifn']);
+            $headers = $file->fgetcsv($this->vars['delimiter'], $this->vars['quotechar'], $this->vars['escapechar']);
+            $sl = $file->fgetcsv($this->vars['delimiter'], $this->vars['quotechar'], $this->vars['escapechar']);
             if(count($sl) !== count($cols)){
                 $baseurl = explode('?', $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'])[0];
                 trigger_error("Number of columns inconsistent throughout file. For more information, see the error documentation.");
@@ -278,8 +323,8 @@ EOF;
                                                         "VARCHAR(512) DEFAULT NULL";
                 $col .= " COMMENT '$cname'";
             }
-            array_unshift($cols, '    `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT \'id\'');
         }
+        array_unshift($cols, '    `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT \'id\'');
         $SQL = "CREATE TABLE IF NOT EXISTS `{$this->vars['db']['db']}`.`{$this->vars['db']['table']}` (\n";
         $SQL .= implode(",\n", $cols);
         $SQL .= "\n) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
@@ -350,9 +395,9 @@ EOF;
         $this->vars['chunks']     = (isset($_GET["chunks"])) ? intval($_GET["chunks"]) : 1000;
         $this->vars['limit']      = (isset($_GET["limit"])) ? intval($_GET["limit"]) : INF;
         $this->vars['replace']    = (isset($_GET["replace"])) ? filter_var($_GET["replace"],FILTER_VALIDATE_BOOLEAN) : false;
-        $this->vars['delimiter']  = (isset($_GET["delimiter"])  && $_GET["delimiter"]  !== '') ? $_GET["delimiter"]  : false;
-        $this->vars['quotechar']  = (isset($_GET["quotechar"])  && $_GET["quotechar"]  !== '') ? $_GET["quotechar"]  : false;
-        $this->vars['escapechar'] = (isset($_GET["escapechar"]) && $_GET["escapechar"] !== '') ? $_GET["escapechar"] : false;
+        $this->vars['delimiter']  = (isset($_GET["delimiter"])  && $_GET["delimiter"]  !== '') ? $_GET["delimiter"]  : ',';
+        $this->vars['quotechar']  = (isset($_GET["quotechar"])  && $_GET["quotechar"]  !== '') ? $_GET["quotechar"]  : '"';
+        $this->vars['escapechar'] = (isset($_GET["escapechar"]) && $_GET["escapechar"] !== '') ? $_GET["escapechar"] : '\\';
         // has headers
         $this->vars['hh'] = (isset($_GET["hh"])) ? filter_var($_GET["hh"], FILTER_VALIDATE_BOOLEAN) :false;
         $this->vars['aa'] = (isset($_GET["aa"])) ? filter_var($_GET["aa"], FILTER_VALIDATE_BOOLEAN) :true;
@@ -380,6 +425,12 @@ EOF;
         unset($parts[0]);
         $parts = array_reverse($parts);
         return CSVRunner::toTableName(implode('.',$parts));
+    }
+
+    public function numLines()
+    {
+        if($this->state['numlines']) return $this->state['numlines'];
+        else return self::numRowsInFile($this->vars['ifn']);
     }
 
     public static function numRowsInFile($fn)
@@ -495,7 +546,7 @@ EOF;
         return $result;
     }
 
-    public static function csvFileToArray($filename='', $delimiter=',', $quotechar='"', $escapechar = '\\')
+    public static function csvFileToArray($filename='', $delimiter=',', $quotechar='"', $escapechar = "\\")
     {
         if(!file_exists($filename) || !is_readable($filename))
             return FALSE;
@@ -510,42 +561,22 @@ EOF;
 
         $f = fopen($filename, 'r');
         $data = array();
-        if (($handle = fopen($filename, 'r')) !== FALSE)
-        {
-            $line = fgets($f);
-            fclose($f);
-            $header = str_getcsv($line, $delimiter, $quotechar, $escapechar);
-            $csv = file_get_contents($filename);
-            $csv = substr($csv, strpos($csv, "\n")+1);
-            $csv = str_getcsv($csv, $delimiter, $quotechar, $escapechar);
-            $numHeaders = count($header);
-            $tempCsv = array();
-            $numRows = count($csv);
-            foreach($csv as $key => $field){
-                if($key % ($numHeaders-1) == 0 && $key !== 0 && $key !== $numRows-1){
-                    $parts = explode("\n", $field);
-                    if(count($parts) == 2){
-                        $nf = trim($parts[0]);
-                        if($nf[0] == '"' && $nf[strlen($nf)-1] == '"'){
-                            $nf = substr($nf, 1, strlen($nf)-2);
-                        }
-                        $tempCsv[] = trim($nf);
-                        $nf = trim($parts[1]);
-                        if($nf[0] == '"' && $nf[strlen($nf)-1] == '"'){
-                            $nf = substr($nf, 1, strlen($nf)-2);
-                        }
-                        $tempCsv[] = $nf;
-                    }
-                } else {
-                    $tempCsv[] = $field;
-                }
+
+        $file = new SplFileObject($filename);
+        $headers = $file->fgetcsv($delimiter, $quotechar, $escapechar);
+        $i = 0;
+        $output = array();
+        $headerCount = count($headers);
+        while (!$file->eof()) {
+            $i++;
+            $csv = $file->fgetcsv($delimiter, $quotechar, $escapechar);
+            if($headerCount !== count($csv) && count($csv) == 1 && trim($csv[0]) == ''){
+                continue;
             }
-            $csv = $tempCsv;
-            $csv = array_chunk($csv,count($header));
-            $csv = array_map(function($row) use ($header){
-                return array_combine($header,$row);
-            }, $csv);
+            $csv = array_combine($headers,$csv);
+            $output[] = $csv;
         }
+        $csv = $output;
         return $csv;
     }
 
