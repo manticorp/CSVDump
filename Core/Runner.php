@@ -150,6 +150,7 @@ EOF;
                 $csv = self::csvFileToArray($this->vars['ifn'], $this->vars['delimiter'], $this->vars['quotechar'], $this->vars['escapechar']);
                 $i = 0;
                 $numLines = count($csv);
+                $this->pu->stage->setTotalItems($numLines);
                 foreach($csv as $row){
                     if($rowProcessor !== false){
                         $row = $rowProcessor->process($row);
@@ -163,7 +164,8 @@ EOF;
                         @ob_end_flush();
                         @flush();
 
-                        $this->pu->setStageMessage("Processing Item $i / $numLines");
+                        $this->pu->setStageTotalItems($numLines);
+                        $this->pu->setStageMessage("Processing Item $i / $numLines - " . round(($i/$numLines)*100, 1) . "% Complete");
                         $this->pu->incrementStageItems($this->vars['chunks'], true);
                     }
                     $mysqli = $this->getMysqli();

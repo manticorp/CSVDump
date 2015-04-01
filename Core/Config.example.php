@@ -16,6 +16,6 @@ $vardir = APPLICATION_PATH . DIRECTORY_SEPARATOR;
 $puOptions = array(
     'lineBreak'   => "\n",
     'filename'    => (isset($_GET['progressFn']) ? $vardir . $_GET['progressFn'] : $vardir . 'progress.json'),
-    'totalStages' => 3,
+    'totalStages' => 1,
     'autocalc'    => true,
 );
