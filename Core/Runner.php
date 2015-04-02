@@ -1,67 +1,78 @@
 <?php
 
+// Include our config file
 include_once(__DIR__ . "/Config.php");
 
 /**
  * CsvRunner
  */
 class CSVRunner {
-    private $success = false;
-    private $mysqli = null;
-    private $pu = null;
+
+    private $success = false; // Whether we were succesful or not (unused atm)
+    private $mysqli = null;   // MySQL connection
+    private $pu = null;       // Progress Updater
     private $vars = array(
-        'ifn'           => '',
-        'ofn'           => '',
-        'chunks'        => 1000,
-        'limit'         => INF,
-        'replace'       => true,
-        'hh'            => true,
-        'aa'            => true,
-        'jp'            => true,
-        'rowProcessor'  => false,
-        'dbProcessor'   => false,
-        'method'        => 1,
-        'tableName'     => '',
-        'delimeter'     => false,
-        'quotechar'     => false,
-        'escapechar'    => false,
-        'db' => array(
-            'host'      => 'localhost',
-            'user'      => 'root',
-            'password'  => '',
-            'db'        => '',
-            'table'     => '',
+        'ifn'           => '',            // Input Filename
+        'ofn'           => '',            // Output Filename (temp file)
+        'chunks'        => 1000,          // Amount of rows in each chunk
+        'limit'         => INF,           // Upper limit on rows to process
+        'replace'       => true,          // Whether to replace data in table (or, alternatively, append)
+        'hh'            => true,          // 'Has Headers' whether file has headers
+        'aa'            => true,          // Unused.
+        'jp'            => true,          // 'Just Processing' - deprecated
+        'rowProcessor'  => false,         // The Row Processor Instance
+        'dbProcessor'   => false,         // The DB  Processor Instance
+        'method'        => 1,             // Method (used internally - not really needed, duplicates has header functionality)
+        'tableName'     => '',            // For storing the name of the table (deprecated)
+        'delimeter'     => false,         // The CSV file delimiter
+        'quotechar'     => false,         // The CSV file quote character
+        'escapechar'    => false,         // The CSV file escape character
+        'db' => array(                    // DB details
+            'host'      => 'localhost',     // DB Host
+            'user'      => 'root',          // DB Username
+            'password'  => '',              // DB Password
+            'db'        => '',              // DB Database
+            'table'     => '',              // DB Table to dump to
         ),
     );
 
+    // Possible CSV delimiters (not limited to this, but used as a guideline)
     public static $delimiters = array(
         ',',';','|',':',"\t"
     );
 
+    // Possible CSV quote characters (not limited to this, but used as a guideline)
     public static $quoteChars = array(
         '"','`',"'"
     );
 
+    // Possible CSV escape characters (not limited to this, but used as a guideline)
     public static $escapeChars = array(
         '\\','`',"'"
     );
 
+    // Used to store state variables
     private $state = array(
         'numlines' => 0,
         'ifh'      => null,
         'ofh'      => null,
     );
 
-    public function __construct($pu, $db, $memoryLimit = '512M', $timezone = 'UTC', $timeLimit = 600)
+    /**
+     * Constructs our Runner!
+     * @param \Manticorp\ProgressUpdater $pu           A ProgressUpdater instance
+     * @param array                      $db           The database configuration
+     * @param string                     $memoryLimit  Memory limit to use
+     * @param integer                    $timeLimit    Time limit for script execution
+     */
+    public function __construct(\Manticorp\ProgressUpdater $pu, $db, $memoryLimit = '512M', $timeLimit = 600)
     {
         $this->pu = $pu;
-        $this->vars['db'] = $db;
+        $this->vars['db'] = array_merge($this->vars['db'],$db);
         // Increase memory limit
         ini_set('memory_limit', $memoryLimit);
         // Set time limit
         set_time_limit($timeLimit);
-        // TZ settings
-        date_default_timezone_set($timezone);
         // Turn on all error reporting.
         error_reporting(E_ALL);
         // Register a shutdown function to handle any errors that cause quitting or early termination,
@@ -70,6 +81,10 @@ class CSVRunner {
         return $this;
     }
 
+    /**
+     * Main dump function
+     * @return CSVRunner $this
+     */
     public function dump()
     {
         // initiate a MySQLi connection
@@ -84,15 +99,18 @@ class CSVRunner {
             $this->vars['db']
         );
 
+        // If the table doesn't exist, create it.
         if(!$this->tableExists()){
             $this->createTable();
         }
 
+        // If we want to replace the data in the table, truncate it
         if($this->vars['replace']){
             $SQL = 'TRUNCATE TABLE `' . $this->vars['db']['table'] . '`';
             $this->executeSql($SQL);
         }
 
+        // Update the progressupdater accordingly
         $stageOptions = array(
             'name'       => 'Dumping ',
             'message'    => 'Dumping data',
@@ -107,142 +125,116 @@ class CSVRunner {
     WHERE `TABLE_SCHEMA`='%s'
         AND `TABLE_NAME`='%s';
 EOF;
-
         $SQL = sprintf($SQL, $this->vars['db']['db'], $this->vars['db']['table']);
 
         // Die if result is invalid.
         $r       = $this->executeSql($SQL);
         $columns = $r->fetch_all();
 
+        // Gets a nice array of column names
         $columns = call_user_func_array('array_merge', $columns);
+
+        // We want the 'id' column to be autogenerated
         if(($key = array_search('id', $columns)) !== false) {
             unset($columns[$key]);
         }
 
+        // Delete any old temp files
         if (file_exists($this->vars['ofn'])) {
             unlink($this->vars['ofn']);
         }
 
+        // Call the dbProcessor preImport function
         if($dbProcessor !== false) $dbProcessor->preImport();
 
         switch($this->vars['method']){
-            case 1:
-                /*
-                $file = new SplFileObject($this->vars['ifn']);
-                $i = 0;
-                while (!$file->eof()) {
-                    $i++;
-                    if (($i === 1 & $this->vars['hh']) || $i > $this->vars['limit']) {
-                        continue;
-                    } elseif ($i % $this->vars['chunks'] === 0) {
-
-                        $this->loadAndEmptyCSV($columns);
-
-                        @ob_end_flush();
-                        @flush();
-
-                        $this->pu->setStageMessage("Processing Item $i / $numLines");
-                        $this->pu->incrementStageItems($chunks, true);
-                    }
-                    $csv = $file->fgetcsv($this->vars['delimiter'], $this->vars['quotechar'], $this->vars['escapechar']);
-                    fwrite($this->getOutputFileHandle(), $csv);
-                }*/
+            case 1: // Currently the method for files with headers
+                // Funnily, this method is actually faster than looping through
+                // using the SPL file thing :/ it would seem, anyway...
+                // Also, it may seem counter intuitive to load the whole
+                // CSV into an array, but it's the only way to get an accurate line
+                // count...and it helps in so many ways...
+                //
+                // Really, method 2 can be used for everything if the line count isn't
+                // important to you...
                 $csv = self::csvFileToArray($this->vars['ifn'], $this->vars['delimiter'], $this->vars['quotechar'], $this->vars['escapechar']);
                 $i = 0;
                 $numLines = count($csv);
                 $this->pu->stage->setTotalItems($numLines);
+                $headers = array_keys($csv[0]);
+                $this->pu->setStageTotalItems($numLines);
                 foreach($csv as $row){
                     if($rowProcessor !== false){
                         $row = $rowProcessor->process($row);
                     }
                     $i++;
                     if ($i % $this->vars['chunks'] === 0) {
-                        $this->loadAndEmptyCSV(array_keys($row));
-
-                        // printf('%7d / %7d <br />',$i, $numLines);
-
-                        @ob_end_flush();
-                        @flush();
-
-                        $this->pu->setStageTotalItems($numLines);
+                        $this->loadAndEmptyCSV($headers);
                         $this->pu->setStageMessage("Processing Item $i / $numLines - " . round(($i/$numLines)*100, 1) . "% Complete");
                         $this->pu->incrementStageItems($this->vars['chunks'], true);
                     }
                     $mysqli = $this->getMysqli();
-                    if(!is_array($row)){
-                        print_r($row);
-                        exit();
-                    }
                     $row = array_map(function($a) use ($mysqli){ return $mysqli->real_escape_string($a);}, $row);
                     fwrite($this->getOutputFileHandle(), $this->processLine($row));
                 }
-                $this->loadAndEmptyCSV(array_keys($row));
+                $this->loadAndEmptyCSV($columns);
                 break;
-            case 2:
+            case 2: // Currently the method for files without headers.
             default:
+                // Here we use the super duper SplFileObject...
                 $file = new SplFileObject($this->vars['ifn']);
                 $i = 0;
                 while (!$file->eof()) {
                     $i++;
-                    if (($i === 1 & $this->vars['hh']) || $i > $this->vars['limit']) {
+                    if (($i === 1 && $this->vars['hh']) || $i > $this->vars['limit']) {
                         continue;
                     } elseif ($i % $this->vars['chunks'] === 0) {
-
                         $this->loadAndEmptyCSV($columns);
-
-                        @ob_end_flush();
-                        @flush();
-
                         $this->pu->setStageMessage("Processing Item $i / $numLines");
                         $this->pu->incrementStageItems($this->vars['chunks'], true);
                     }
-                    $csv = $file->fgetcsv($this->vars['delimiter'], $this->vars['quotechar'], $this->vars['escapechar']);
-                    fwrite($this->getOutputFileHandle(), $this->processLine($csv));
-                }
-                /*
-                if ($this->getInputFileHandle()) {
-                    $i = 0;
-                    while (($buffer = fgets($infile)) !== false) {
-                        $i++;
-                        if (($i === 1 & $this->vars['hh']) || $i > $this->vars['limit']) {
-                            continue;
-                        } elseif ($i % $this->vars['chunks'] === 0) {
-
-                            $this->loadAndEmptyCSV($columns);
-
-                            @ob_end_flush();
-                            @flush();
-
-                            $this->pu->setStageMessage("Processing Item $i / $numLines");
-                            $this->pu->incrementStageItems($chunks, true);
-                        }
-                        fwrite($this->getOutputFileHandle(), $this->processLine($buffer, $this->vars['method']));
+                    $row = $file->fgetcsv($this->vars['delimiter'], $this->vars['quotechar'], $this->vars['escapechar']);
+                    if($rowProcessor !== false){
+                        $row = $rowProcessor->process($row);
                     }
-                    if (!feof($this->getInputFileHandle())) {
-                        trigger_error('Error: Unexpected FGETS() fail.');
-                    }
-                    fclose($this->getInputFileHandle());
-                } else {
-                    trigger_error("Failed to open $fn");
+                    fwrite($this->getOutputFileHandle(), $this->processLine($row));
                 }
-                */
                 $this->loadAndEmptyCSV($columns);
                 break;
         }
 
+        // Close the file and delete it.
         fclose($this->state['ofh']);
         if (file_exists($this->vars['ofn'])) {
             @unlink($this->vars['ofn']);
         }
 
+        // Do our post import function.
         if($dbProcessor !== false) $dbProcessor->postImport();
 
+        // We're all done!
         $msg = 'Totally Completed';
         $this->pu->totallyComplete($msg);
 
         return $this;
     }
 
+    /**
+     * A far too convoluted, non-self documenting function
+     * for processing each line. It basically does a bunch
+     * of replacements on each cell and then it implodes it
+     * into a regularised CSV format.
+     *
+     * This may seem counter intuitive, but basically this
+     * allows us to get it into a distinct, reliable format
+     * for use with inserting into MySQL tables using the
+     * LOAD DATA INFILE functionality...
+     *
+     * From experience, this seems to be the fastest and most
+     * hassle free way of doing it.
+     * @param  array  $line The current 'line' or row from the CSV file
+     * @return string       A csv string representing that line
+     */
     private function processLine($line)
     {
         return
@@ -264,6 +256,12 @@ EOF;
         . "\"\n";
     }
 
+    /**
+     * Uses the LOAD DATA LOCAL INFILE function to load data
+     * into our MySQL table based on our temp csv file.
+     * @param  array        $columns The column names
+     * @return file pointer          The output file pointer (as we create a new one)
+     */
     private function loadAndEmptyCSV($columns = null)
     {
         fclose($this->state['ofh']);
@@ -286,6 +284,14 @@ EOF;
         return $this->state['ofh'] ;
     }
 
+    /**
+     * Used to create the database table in the case there is none.
+     *
+     * It basically gleans info from the first line of the data file.
+     * For better definitions of columns, it's pretty essential to just
+     * use a DB Processor class.
+     * @return CSVRunner $this
+     */
     public function createTable()
     {
         // Create out table
@@ -318,6 +324,7 @@ EOF;
                 trigger_error("Number of columns inconsistent throughout file. For more information, see the error documentation.");
                 exit(1);
             }
+            // We can pretty much only guess two data types from one row of information
             foreach ($cols as $i => &$col) {
                 $cname = $col;
                 $col = '    `' . $cname . '` ';
@@ -326,6 +333,7 @@ EOF;
                 $col .= " COMMENT '$cname'";
             }
         }
+        // Always have an id column!
         array_unshift($cols, '    `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT \'id\'');
         $SQL = "CREATE TABLE IF NOT EXISTS `{$this->vars['db']['db']}`.`{$this->vars['db']['table']}` (\n";
         $SQL .= implode(",\n", $cols);
@@ -334,6 +342,11 @@ EOF;
         return $this;
     }
 
+    /**
+     * Pretty self explanatory, gets our input file handle
+     * or creates it if it doesn't exist yet.
+     * @return file handle The input file handle
+     */
     public function getInputFileHandle()
     {
         if($this->state['ifh'] === null || $this->state['ifh'] === false){
@@ -342,6 +355,11 @@ EOF;
         return $this->state['ifh'];
     }
 
+    /**
+     * Pretty self explanatory, gets our output file handle
+     * or creates it if it doesn't exist yet.
+     * @return file handle The output file handle
+     */
     public function getOutputFileHandle()
     {
         if($this->state['ofh'] === null || $this->state['ofh'] === false){
@@ -350,6 +368,17 @@ EOF;
         return $this->state['ofh'];
     }
 
+
+    /**
+     * Returns a file handle for $fn
+     * @return file handle The input file handle
+     */
+    /**
+     * Returns a file handle for $fn
+     * @param  string       $fn   The filename
+     * @param  string       $mode Mode
+     * @return file handle        Thefile handle
+     */
     private function getFileHandle($fn, $mode = 'r')
     {
         if(!file_exists($fn) && $mode == 'r') trigger_error($fn . ' does not exist');
@@ -363,6 +392,10 @@ EOF;
         return $fh;
     }
 
+    /**
+     * Detects if our table already exists
+     * @return boolean Whether or not a table with our name exists.
+     */
     public function tableExists()
     {
         /**
@@ -378,6 +411,10 @@ EOF;
         return !($result->num_rows == 0);
     }
 
+    /**
+     * Gets variables from the URL and loads them into our var variable.
+     * @return CSVRunner $this
+     */
     public function getVars()
     {
         $this->vars['db']['db'] = (isset($_GET['db']) && !empty($_GET['db'])) ? $_GET['db'] : $this->vars['db']['db'];
@@ -420,6 +457,11 @@ EOF;
         return $this;
     }
 
+    /**
+     * Gets a database friendly table name from a filename
+     * @param  string $fn Filename
+     * @return string     The table name
+     */
     public static function getDBName($fn)
     {
         $parts = explode('.',basename($fn));
@@ -429,12 +471,21 @@ EOF;
         return CSVRunner::toTableName(implode('.',$parts));
     }
 
+    /**
+     * Get the number of lines in our input file
+     * @return int The number of lines
+     */
     public function numLines()
     {
         if($this->state['numlines']) return $this->state['numlines'];
         else return self::numRowsInFile($this->vars['ifn']);
     }
 
+    /**
+     * Gets an estimate for the number of rows in a file.
+     * @param  string $fn Filename
+     * @return int        The number of lines in the file.
+     */
     public static function numRowsInFile($fn)
     {
         $numLines = 0;
@@ -453,6 +504,13 @@ EOF;
         return $numLines;
     }
 
+    /**
+     * Creates a database suitable table name from a string.
+     *
+     * This isn't strictly necessary - MySQL is pretty flexible
+     * @param  string $name The input name
+     * @return string       The output name
+     */
     public static function toTableName($name)
     {
         $name = str_replace(" ","_",$name);
