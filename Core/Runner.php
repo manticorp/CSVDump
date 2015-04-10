@@ -169,7 +169,7 @@ EOF;
                     }
                     $i++;
                     if ($i % $this->vars['chunks'] === 0) {
-                        $this->loadAndEmptyCSV($headers);
+                        $this->loadAndEmptyCSV(array_keys($row));
                         $this->pu->setStageMessage("Processing Item $i / $numLines - " . round(($i/$numLines)*100, 1) . "% Complete");
                         $this->pu->incrementStageItems($this->vars['chunks'], true);
                     }
@@ -177,7 +177,7 @@ EOF;
                     $row = array_map(function($a) use ($mysqli){ return $mysqli->real_escape_string($a);}, $row);
                     fwrite($this->getOutputFileHandle(), $this->processLine($row));
                 }
-                $this->loadAndEmptyCSV($columns);
+                $this->loadAndEmptyCSV(array_keys($row));
                 break;
             case 2: // Currently the method for files without headers.
             default:
@@ -266,7 +266,7 @@ EOF;
     {
         fclose($this->state['ofh']);
         $SQL = "LOAD DATA LOCAL INFILE '" . str_replace('\\', '\\\\', realpath($this->vars['ofn'])) . "'
-    INTO TABLE {$this->vars['db']['table']}
+    INTO TABLE `{$this->vars['db']['table']}`
     FIELDS TERMINATED BY ',' ENCLOSED BY '\"' ESCAPED BY '\\\\'
     LINES TERMINATED BY '\\n'";
 
