@@ -114,6 +114,11 @@ abstract class Processor_DB_Abstract
         return $this->params['table'];
     }
 
+    public function getDbName()
+    {
+        return $this->params['db'];
+    }
+
     public function getConnection()
     {
         $mysql_server   = $this->params['host'];

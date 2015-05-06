@@ -165,17 +165,28 @@ EOF;
                 $this->pu->setStageTotalItems($numLines);
                 foreach($csv as $row){
                     if($rowProcessor !== false){
-                        $row = $rowProcessor->process($row);
+                        $rows = $rowProcessor->process($row);
+                    } else {
+                        $rows = $row;
+                    }
+                    if(!is_array($rows[array_keys($rows)[0]])){
+                        $rows = array($rows);
                     }
                     $i++;
                     if ($i % $this->vars['chunks'] === 0) {
-                        $this->loadAndEmptyCSV(array_keys($row));
+                        $this->loadAndEmptyCSV(array_keys($rows[0]));
                         $this->pu->setStageMessage("Processing Item $i / $numLines - " . round(($i/$numLines)*100, 1) . "% Complete");
                         $this->pu->incrementStageItems($this->vars['chunks'], true);
                     }
+                    if(count($rows)==0){
+                        continue;
+                    }
                     $mysqli = $this->getMysqli();
-                    $row = array_map(function($a) use ($mysqli){ return $mysqli->real_escape_string($a);}, $row);
-                    fwrite($this->getOutputFileHandle(), $this->processLine($row));
+                    foreach($rows as $row){
+                        $row = array_map(function($a) use ($mysqli){ return $mysqli->real_escape_string($a);}, $row);
+                        $out = $this->processLine($row);
+                        fwrite($this->getOutputFileHandle(), $out);
+                    }
                 }
                 $this->loadAndEmptyCSV(array_keys($row));
                 break;
@@ -197,7 +208,13 @@ EOF;
                     if($rowProcessor !== false){
                         $row = $rowProcessor->process($row);
                     }
-                    fwrite($this->getOutputFileHandle(), $this->processLine($row));
+                    if(!is_array($rows[array_keys($rows)[0]])){
+                        $rows = array($rows);
+                    }
+                    foreach($rows as $row){
+                        $row = array_map(function($a) use ($mysqli){ return $mysqli->real_escape_string($a);}, $row);
+                        fwrite($this->getOutputFileHandle(), $this->processLine($row));
+                    }
                 }
                 $this->loadAndEmptyCSV($columns);
                 break;
@@ -244,10 +261,8 @@ EOF;
             array_map(
                 function ($e) {
                     if($e == '' || $e == 'NULL' || $e == null) return '\\N';
-                    return str_replace('NULL', '\\N',
-                        str_replace("\n", '\n',
-                            str_replace('"', "\\'", $e)
-                        )
+                    return str_replace("\n", '\n',
+                        $e
                     );
                 },
                 $line
