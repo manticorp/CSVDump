@@ -22,7 +22,7 @@
     <body>
         <div class="page-header">
             <div class="container">
-                <h1>CSVDump <small>Dump CSV files into a MySQL Database</small></h1>
+                <h1>CSVDump <small>Dump CSV files into a MySQL Database <em>fast</em></small></h1>
             </div>
         </div>
 <?php

@@ -104,6 +104,10 @@ button:active,
 .page-header h1 small {
   color: rgba(190, 190, 200, 0.7);
 }
+.page-header h1 small em {
+  color: #de7272;
+  border-bottom: 1px solid #de7272;
+}
 .dump-file a {
   color: #aaaa10;
 }
