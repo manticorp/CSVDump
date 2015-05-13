@@ -119,6 +119,17 @@ abstract class Processor_DB_Abstract
         return $this->params['db'];
     }
 
+    public function getColumnDefinition($col)
+    {
+        $sql = "SHOW FIELDS FROM `".$this->getTableName()."`;";
+        $r = $this->query($sql);
+        while($row = $r->fetch_array(MYSQLI_ASSOC)){
+            if($row['Field'] == $col) return $row;
+        }
+        trigger_error('Column ' . $col . ' doesn\'t exist');
+        exit(1);
+    }
+
     public function getConnection()
     {
         $mysql_server   = $this->params['host'];

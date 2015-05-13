@@ -34,6 +34,33 @@ class CSVRunner {
             'db'        => '',              // DB Database
             'table'     => '',              // DB Table to dump to
         ),
+        'columnTypes'   => array(),
+    );
+
+    public static $colTypes = array(
+        'boolean',
+        'smallint',
+        'integer',
+        'bigint',
+        'float',
+        'numeric',
+        'decimal',
+        'date',
+        'timestamp',
+        'datetime',
+        'text',
+        'blob',
+        'varbinary',
+        'tinyint',
+        'char',
+        'varchar',
+        'longvarchar',
+        'cblob',
+        'double',
+        'real',
+        'time',
+        'binary',
+        'longvarbinary',
     );
 
     // Possible CSV delimiters (not limited to this, but used as a guideline)
@@ -109,6 +136,13 @@ class CSVRunner {
             $SQL = 'TRUNCATE TABLE `' . $this->vars['db']['table'] . '`';
             $this->executeSql($SQL);
         }
+
+        // Now we can change the columns according to the coltypes defined
+        $processor = $this->getProcessor(
+            'Processor_DB_Core',
+            $this->vars['db']
+        );
+        $processor->changeColTypes($this->vars['columnTypes']);
 
         // Update the progressupdater accordingly
         $stageOptions = array(
@@ -354,6 +388,7 @@ EOF;
         $SQL .= implode(",\n", $cols);
         $SQL .= "\n) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
         $this->executeSql($SQL);
+
         return $this;
     }
 
@@ -468,6 +503,9 @@ EOF;
 
         // Gets the table name
         $this->vars['db']['table'] = (isset($_GET['table']) && !empty($_GET['table'])) ? $_GET['table'] : CSVRunner::getDBName($this->vars['ifn']);
+
+        // Gets the column types as defined by the user
+        $this->vars['columnTypes'] = json_decode($_GET['columnTypes']);
 
         return $this;
     }
@@ -709,6 +747,18 @@ EOF;
         $occurences = array_flip($occurences);
         $quote = array_shift($occurences);
         return $quote;
+    }
+
+
+    /**
+     * Gets the first row of a CSV file as an array
+     * @param  string $fn The file
+     * @return array      The first row
+     */
+    public static function getFirstRow($fn){
+        $file = new SplFileObject($fn);
+        $row = $file->fgetcsv();
+        return $row;
     }
 }
 
