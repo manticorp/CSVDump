@@ -18,31 +18,37 @@ $(function() {
         $(this).children('span').toggleClass('glyphicon-chevron-down').toggleClass('glyphicon-chevron-up');
     });
 
-    // make sure we support html5 storage
-    if (!supports_html5_storage()) {
-        $('#supports_html5_storage').show();
-    }
     // store the table name in the orig data attribute for each table
     $('.tableName').each(function() {
         $(this).data('orig', $(this).text());
-    });
-    // When we change the table name, it displays it in the right place, unless it's empty, then we revert to the orig above
-    $('#inputTable').keyup(function(e) {
-        $('.tableName').each(function() {
-            var t = ($('#inputTable').val()) ? $('#inputTable').val() : $(this).data('orig');
-            $(this).text(t);
-        });
     });
     // Same as above
     $('.databaseName').each(function() {
         $(this).data('orig', $(this).text());
     });
-    $('#inputDb').keyup(function(e) {
-        $('.databaseName').each(function() {
-            var t = ($('#inputDb').val()) ? $('#inputDb').val() : $(this).data('orig');
-            $(this).text(t);
-        });
-    });
+
+    // make sure we support html5 storage
+    if (!supports_html5_storage()) {
+        $('#supports_html5_storage').show();
+    } else {
+        database        = window.localStorage.getItem('database');
+        table           = window.localStorage.getItem('table');
+        processor       = window.localStorage.getItem('processor');
+        if(database !== null){
+            $('#inputDb').val(database);
+        }
+        if(table !== null){
+            $('#inputTable').val(table);
+        }
+        if(table !== null){
+            $('#processor').val(processor);
+        }
+        updateTableDb();
+    }
+
+    // When we change the table/database name, it displays it in the right place, unless it's empty, then we revert to the original
+    $('#inputTable').keyup(updateTableDb);
+    $('#inputDb').keyup(updateTableDb);
 
     // Main file processing process handler
     $('.process-file').click(function() {
@@ -83,7 +89,7 @@ $(function() {
             columnTypes: ctypes
         };
 
-        $.getJSON('Core/App.php', data,
+        $.getJSON('CSVRunner/App.php', data,
             function(data) {
                 console.log("ALL DONE", data);
                 clearInterval(window.progressInterval);
@@ -114,6 +120,20 @@ $(function() {
         }, 750);
     });
 });
+
+function updateTableDb(){
+    $('.databaseName').each(function() {
+        var t = ($('#inputDb').val()) ? $('#inputDb').val() : $(this).data('orig');
+        $(this).text(t);
+    });
+    $('.tableName').each(function() {
+        var t = ($('#inputTable').val()) ? $('#inputTable').val() : $(this).data('orig');
+        $(this).text(t);
+    });
+    window.localStorage.setItem('database',  $('#inputDb').val());
+    window.localStorage.setItem('table',     $('#inputTable').val());
+    window.localStorage.setItem('processor', $('#processor').val());
+}
 
 function displayError(data) {
     clearInterval(window.progressInterval);

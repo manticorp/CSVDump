@@ -27,17 +27,17 @@
         </div>
 <?php
 // Just check that our Config file exists and display a message otherwise
-if(!file_exists('./Core/Config.php')):
+if(!file_exists('./CSVRunner/Config.php')):
 ?>
         <div class="container">
             <div class="row">
                 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                     <div class="warning" id="config_file_not_exists">
-                        <p>You are missing the /Core/Config.php file.</p>
-                    <?php if(file_exists('./Core/Config.example.php')): ?>
-                        <p>Edit <code>/Core/Config.example.php</code> with your database details and save as <code>/Core/Config.php</code>.</p>
+                        <p>You are missing the /CSVRunner/Config.php file.</p>
+                    <?php if(file_exists('./CSVRunner/Config.example.php')): ?>
+                        <p>Edit <code>/CSVRunner/Config.example.php</code> with your database details and save as <code>/CSVRunner/Config.php</code>.</p>
                     <?php else: ?>
-                        <p>Also missing <code>/Core/Config.example.php</code>, please <a href='https://github.com/manticorp/CSVDump'>re-download the repository.</a></p>";
+                        <p>Also missing <code>/CSVRunner/Config.example.php</code>, please <a href='https://github.com/manticorp/CSVDump'>re-download the repository.</a></p>";
                     <?php endif; ?>
                     </div>
                 </div>
@@ -45,8 +45,8 @@ if(!file_exists('./Core/Config.php')):
         </div>
         <?php
 // Else display the interface
-else: // if(!file_exists('./Core/Config.php')):
-            include "./Core/Runner.php";
+else: // if(!file_exists('./CSVRunner/Config.php')):
+            include "./CSVRunner/CSVRunner.php";
             $baseurl = explode('?', $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'])[0];
             $msg   = null;
             $error = false;
@@ -210,7 +210,7 @@ else: // if(!file_exists('./Core/Config.php')):
         <!-- jQuery -->
         <script src="//code.jquery.com/jquery.js"></script>
         <script src='js/main.js' type="text/javascript"></script>
-<?php endif; // if(!file_exists('./Core/Config.php')): ?>
+<?php endif; // if(!file_exists('./CSVRunner/Config.php')): ?>
         <!-- Bootstrap JavaScript -->
         <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
     </body>

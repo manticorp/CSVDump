@@ -599,7 +599,7 @@ EOF;
             'DB',
             'Row',
         );
-        $prefix  = APPLICATION_PATH . '/Core/Processor/';
+        $prefix  = APPLICATION_PATH . '/CSVRunner/Processor/';
         $suffix  = '/*.php';
         $folders = array_map(function ($e) use ($prefix, $suffix) {return $prefix . $e . $suffix;}, $folders);
         $files = array_map('basename', call_user_func_array('array_merge', array_map('glob', $folders)));
