@@ -117,7 +117,7 @@ $(function() {
         });
         setTimeout(function() {
             window.progressInterval = setInterval(checkProgress, window.updatePeriod);
-        }, 100);
+        }, 500);
     });
 });
 
