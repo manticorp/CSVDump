@@ -6,7 +6,7 @@ window.pollingPeriod = 1000;
 window.updatePeriod = 250;
 window.lastData = null;
 window.lastUpdate;
-window.progressFn = 'var/progress' + Math.random() + '.json';
+window.progressFn = 'var/progress-' + Math.floor(Math.random()*100000) + '.json';
 
 $(function() {
     // toggle tooltips
@@ -117,7 +117,7 @@ $(function() {
         });
         setTimeout(function() {
             window.progressInterval = setInterval(checkProgress, window.updatePeriod);
-        }, 750);
+        }, 100);
     });
 });
 
