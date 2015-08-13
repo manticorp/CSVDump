@@ -2,6 +2,7 @@ var/*
 *.sublime-project
 *.sublime-workspace
 !input/test.csv
+!input/longTest.csv
 !input/malformedFile.csv
 input/*.csv
 input/*
