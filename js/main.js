@@ -104,6 +104,19 @@ $(function() {
                             $('#script-progress').addClass('hidden');
                         });
                     }
+                    if (!$('#script-progress-mini').hasClass('hidden')) {
+                        $('#script-progress-mini').fadeOut(200, function() {
+                            $('#script-progress-mini').addClass('hidden');
+                        });
+                    }
+                    if ($('#done-message').hasClass('hidden')) {
+                        $('#done-message').removeClass('hidden').fadeIn(200);
+                        setTimeout(function() {
+                            $('#done-message').fadeOut(200, function() {
+                                $('#done-message').addClass('hidden');
+                            });
+                        }, 1300);
+                    }
                     var d = new Date();
                     $output = $('<h4>Done! ' + d.toLocaleDateString() + ' ' + d.toLocaleTimeString() + '</h4>');
                     $output.append('<span id="typed-cursor" class="blinking">|</span>');
@@ -117,7 +130,7 @@ $(function() {
         });
         setTimeout(function() {
             window.progressInterval = setInterval(checkProgress, window.updatePeriod);
-        }, 500);
+        }, 750);
     });
 });
 
@@ -166,6 +179,15 @@ function createAndInsertStatusBars(num) {
             .attr('aria-valuemax', 100)
             .css('width', '0%');
         $('#script-progress').append($bar);
+        var $bar2 = $('#progress-bar-start-mini').clone();
+        $bar2.addClass('tertiary-status-mini')
+            .addClass(newStatus)
+            .attr('id', 'tertiary-status-mini-' + i)
+            .attr('aria-valuenow', 0)
+            .attr('aria-valuemin', 0)
+            .attr('aria-valuemax', 100)
+            .css('width', '0%');
+        $('#script-progress-mini').append($bar2);
     }
     return statusBars;
 }
@@ -192,7 +214,7 @@ function checkProgress(createStatusBars) {
             updateDisplay(data);
             return null;
         }).fail(function() {
-            clearInterval(window.progressInterval);
+            // clearInterval(window.progressInterval);
         });
     } else {
         var data = $.extend({}, window.lastData);
@@ -216,6 +238,10 @@ function updateDisplay(data) {
 
     if ($('#script-progress').hasClass('hidden')) {
         $('#script-progress').hide().removeClass('hidden').fadeIn(200);
+    }
+
+    if ($('#script-progress-mini').hasClass('hidden')) {
+        $('#script-progress-mini').hide().removeClass('hidden').fadeIn(200);
     }
 
     if (window.prevpc === data.stage.pcComplete & data.stage.rate !== null) {
@@ -244,12 +270,21 @@ function updateDisplay(data) {
             .attr('aria-valuenow', (1 / (data.totalStages)) * 100)
             .css('width', (1 / (data.totalStages)) * 100 + "%");
     }
+    for (i = (data.stage.stageNum - 1); i > 0; i--) {
+        $('#tertiary-status-mini-' + (i))
+            .attr('aria-valuenow', (1 / (data.totalStages)) * 100)
+            .css('width', (1 / (data.totalStages)) * 100 + "%");
+    }
 
     var percentOfTotal = (((1 / (data.totalStages)) * data.stage.pcComplete) * 100);
     $('#tertiary-status-' + (data.stage.stageNum - 1))
         .attr('aria-valuenow', percentOfTotal)
         .css('width', percentOfTotal + "%");
     $('#tertiary-status-' + (data.stage.stageNum - 1) + ' span').text(Math.ceil(percentOfTotal * 100) + "%");
+    $('#tertiary-status-mini-' + (data.stage.stageNum - 1))
+        .attr('aria-valuenow', percentOfTotal)
+        .css('width', percentOfTotal + "%");
+    $('#tertiary-status-mini-' + (data.stage.stageNum - 1) + ' span').text(Math.ceil(percentOfTotal * 100) + "%");
 
     $output.append('<span id="typed-cursor" class="blinking">|</span>');
 

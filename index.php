@@ -25,6 +25,18 @@
                 <h1>CSVDump <small>Dump CSV files into a MySQL Database <em>fast</em></small></h1>
             </div>
         </div>
+        <div class="progress hidden" id="script-progress-mini">
+            <div class="progress-bar progress-bar-striped active" id="progress-bar-start-mini" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0">
+                <span class="sr-only">0% Complete</span>
+            </div>
+        </div>
+        <div id="messages">
+            <div class="alert alert-success hidden" id="done-message">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                <strong>Done!</strong>
+                Your file has finished importing!
+            </div>
+        </div>
 <?php
 // Just check that our Config file exists and display a message otherwise
 if(!file_exists('./CSVRunner/Config.php')):
@@ -105,7 +117,7 @@ else: // if(!file_exists('./CSVRunner/Config.php')):
                             </label>
                             <div class="checkbox">
                                 <label for="inputReplace">
-                                    <input type="checkbox" checked value="" name="hh" id="inputReplace" title="Whether to replace existing data">
+                                    <input type="checkbox" value="" name="hh" id="inputReplace" title="Whether to replace existing data">
                                     Replace Data
                                 </label>
                             </div>

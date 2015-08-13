@@ -176,6 +176,9 @@ button:active,
 #script-output em {
   font-family: 'Consolas', 'Courier New', Courier, 'Lucida Sans Typewriter', 'Lucida Typewriter', monospace;
 }
+#script-progress-mini {
+  height: 8px;
+}
 .blinking {
   -webkit-animation: 1s blink step-end infinite;
   -moz-animation: 1s blink step-end infinite;
