@@ -31,7 +31,8 @@ $(function() {
     if (!supports_html5_storage()) {
         $('#supports_html5_storage').show();
     } else {
-        database        = window.localStorage.getItem('database');
+        getStoredState();
+        /*database        = window.localStorage.getItem('database');
         table           = window.localStorage.getItem('table');
         processor       = window.localStorage.getItem('processor');
         if(database !== null){
@@ -42,13 +43,15 @@ $(function() {
         }
         if(table !== null){
             $('#processor').val(processor);
-        }
+        }*/
         updateTableDb();
     }
 
     // When we change the table/database name, it displays it in the right place, unless it's empty, then we revert to the original
     $('#inputTable').keyup(updateTableDb);
     $('#inputDb').keyup(updateTableDb);
+    $('input[type=text],input[type=number]').keyup(setStoredState);
+    $('input, select').change(setStoredState);
 
     // Main file processing process handler
     $('.process-file').click(function() {
@@ -150,6 +153,39 @@ $(function() {
     });
 });
 
+function setStoredState() {
+    console.log('setStoredState');
+    $('input[type=checkbox]').each(function(i, el){
+        if($(el).attr('id') !== undefined){
+            window.localStorage.setItem($(el).attr('id'),$(el).prop('checked'));
+        }
+    });
+    $('input[type!=checkbox], select').each(function(i, el){
+        if($(el).attr('id') !== undefined){
+            window.localStorage.setItem($(el).attr('id'),$(el).val());
+        }
+    });
+}
+
+function getStoredState() {
+    $('input[type=checkbox]').each(function(i, el){
+        if($(el).attr('id') !== undefined){
+            var isChecked = window.localStorage.getItem($(el).attr('id'));
+            if(isChecked !== null){
+                $(el).prop('checked',isChecked === 'true');
+            }
+        }
+    });
+    $('input[type!=checkbox], select').each(function(i, el){
+        if($(el).attr('id') !== undefined){
+            var val = window.localStorage.getItem($(el).attr('id'));
+            if(val !== null){
+                $(el).val(val);
+            }
+        }
+    });
+}
+
 function updateTableDb(){
     $('.databaseName').each(function() {
         var t = ($('#inputDb').val()) ? $('#inputDb').val() : $(this).data('orig');
@@ -159,9 +195,7 @@ function updateTableDb(){
         var t = ($('#inputTable').val()) ? $('#inputTable').val() : $(this).data('orig');
         $(this).text(t);
     });
-    window.localStorage.setItem('database',  $('#inputDb').val());
-    window.localStorage.setItem('table',     $('#inputTable').val());
-    window.localStorage.setItem('processor', $('#processor').val());
+    setStoredState();
 }
 
 function displayError(data) {

@@ -156,13 +156,13 @@ else: // if(!file_exists('./CSVRunner/Config.php')):
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php $i = 0; foreach (glob(APPLICATION_PATH . '/input/*.csv') as $fn): $i++; ?>
+                                <?php $i = 0; $files = glob(APPLICATION_PATH . '/input/*.csv'); foreach ($files as $fn): $i++; $idBase = CSVRunner::getDBName($fn); ?>
                                 <tr class="main-row">
                                     <td class="expand"><span class="glyphicon glyphicon-chevron-down"></span></td>
                                     <td><?php echo basename($fn);?></td>
                                     <td><?php echo CSVRunner::fileSizeString($fn, 1);?></td>
                                     <td><?php echo CSVRunner::numRowsInFile($fn);?></td>
-                                    <td class="dump-file"><a href='#script-progress' class='process-file' data data-jp='false' data-fn='<?php echo urlencode(realpath($fn));?>'><i class="glyphicon glyphicon-import"></i> Dump to <span class="databaseName"><?php echo $db['db'] . '</span>.<span class="tableName">' . CSVRunner::getDBName($fn);?></span></a></td>
+                                    <td class="dump-file"><a href='#script-progress' class='process-file' data data-jp='false' data-fn='<?php echo urlencode(realpath($fn));?>'><i class="glyphicon glyphicon-import"></i> Dump to <span class="databaseName"><?php echo $db['db'] . '</span>.<span class="tableName">' . $idBase;?></span></a></td>
                                     <td class="delete-file" data-toggle="tooltip" data-placement="top" title="Warning: This will delete the file permanently, it will not be recoverable">
                                         <a href='http://<?=$baseurl;?>?delete=true&fn=<?php echo urlencode(realpath($fn));?>'>Delete File <i class="glyphicon glyphicon-trash"></i> <i class="glyphicon glyphicon-warning-sign"></i></a>
                                     </td>
@@ -186,7 +186,7 @@ else: // if(!file_exists('./CSVRunner/Config.php')):
                                                     <tr>
                                                         <td><?php echo $col; ?></td>
                                                         <td>
-                                                            <select data-col="<?php echo $col;?>" name="colType">
+                                                            <select id="<?php echo str_replace(' ','_',$idBase)  . str_replace(' ','_',$col); ?>" data-col="<?php echo $col;?>" name="colType">
                                                                 <option value="auto">Auto Detect</option>
                                                                 <?php foreach(CSVRunner::$colTypes as $type): ?>
                                                                     <option value="<?php echo $type; ?>"><?php echo $type; ?></option>
