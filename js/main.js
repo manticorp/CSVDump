@@ -89,6 +89,22 @@ $(function() {
             columnTypes: ctypes
         };
 
+        var url = 'CSVRunner/App.php?';
+        url += 'fn='+fn+'&';
+        url += 'replace='+replace+'&';
+        url += 'progressFn='+window.progressFn+'&';
+        url += 'chunks='+chunks+'&';
+        url += 'jp='+jp+'&';
+        url += 'db='+db+'&';
+        url += 'table='+table+'&';
+        url += 'hh='+hh+'&';
+        url += 'processor='+processor+'&';
+        url += 'delimiter='+delimiter+'&';
+        url += 'escapechar='+escapechar+'&';
+        url += 'quotechar='+quotechar+'&';
+        url += 'columnTypes='+ctypes;
+        console.log(url);
+
         $.getJSON('CSVRunner/App.php', data,
             function(data) {
                 console.log("ALL DONE", data);

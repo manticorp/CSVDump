@@ -367,18 +367,42 @@ EOF;
             // if our table *does* have headers
             $file = new SplFileObject($this->vars['ifn']);
             $headers = $file->fgetcsv($this->vars['delimiter'], $this->vars['quotechar'], $this->vars['escapechar']);
-            $sl = $file->fgetcsv($this->vars['delimiter'], $this->vars['quotechar'], $this->vars['escapechar']);
+
+            // number of columns to get for guessing types
+            $n = 10;
+            $firstNCols = array();
+            for($i = 0; $i < $n; $i++){
+                $firstNCols[$i] = $file->fgetcsv($this->vars['delimiter'], $this->vars['quotechar'], $this->vars['escapechar']);
+            }
+            $sl = $firstNCols[0];
             if(count($sl) !== count($cols)){
                 $baseurl = explode('?', $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'])[0];
                 trigger_error("Number of columns inconsistent throughout file. For more information, see the error documentation.");
                 exit(1);
             }
+
+            // guess the column types from the first n rows of info
+            $colTypes = array_fill(0,count($cols),null);
+            for($i = 0; $i < $n; $i++){
+                foreach ($cols as $j => &$col) {
+                    $colTypes[$j] = $this->guessType($firstNCols[$i][$j], $colTypes[$j]);
+                }
+            }
+
+            foreach($colTypes as $i => &$type){
+                $type = (is_null($type)) ? 'VARCHAR(512)' : $type;
+            }
+
+            /*echo "<pre>";
+            print_r(array_combine($cols,$colTypes));
+            echo "</pre>";
+            exit();*/
+
             // We can pretty much only guess two data types from one row of information
             foreach ($cols as $i => &$col) {
                 $cname = $col;
                 $col = '    `' . $cname . '` ';
-                $col .= is_numeric($sl[$i]) ? "DECIMAL(12,6) DEFAULT NULL" :
-                                                        "VARCHAR(512) DEFAULT NULL";
+                $col .= $colTypes[$i];
                 $col .= " COMMENT '$cname'";
             }
         }
@@ -390,6 +414,84 @@ EOF;
         $this->executeSql($SQL);
 
         return $this;
+    }
+
+    /**
+     * Guesses the type of a cell based on the value (and the previous value)
+     *
+     * Note we only ever choose VARCHAR and DECIMAL for two reasons:
+     *
+     *  1. It's easy to change from DECIMAL to another number type afterwards, but is impossible the other way around.
+     *  2. VARCHAR will store pretty much any data exactly how it's given to it, so it is again easy to conver from VARCHAR to anything AFTER the fact.
+     *
+     * Why not just choose VARCHAR for everything and hell be damned? Well, of the things I've used this
+     * software for, I mainly have either numbers or text in columns, so it seems to make sense to distinguish
+     * between at least those two. Any finer tuning will be more use-case specific, and DB and ROW processors
+     * can deal with that sort of stuff.
+     *
+     * @param  mixed  $val      The cell value
+     * @param  string $prevType The previously guessed type
+     * @return string           The guessed type
+     */
+    public function guessType($val, $prevType){
+        if($val === '' || $val === null){
+            return null; // we can't guess anything from nothing.
+        }
+        // get the simple part of our type, e.g. VARCHAR(512) becomes VARCHAR
+        $prevTypeSimple = (is_null($prevType)) ? null : explode('(',$prevType)[0];
+        // If we have a numeric type that wasn't previously determined to need a VARCHAR
+        if(is_numeric($val) && $prevTypeSimple !== 'VARCHAR'){
+            // Check we don't have a leading zero string (e.g. barcodes)
+            if((string)$val[0] === '0' && (string)$val[1] !== '.'){
+                $type = 'VARCHAR(512) DEFAULT NULL';
+            } else if (strpos($val,".") !== false) { // Check for decimals
+                $prevPrecision = (is_null($prevType)) ? array(12,6) : $this->getDecimalPrecisions($prevType);
+                print_r($prevPrecision);echo "\n";
+                $type = 'DECIMAL';
+                $parts = explode('.',$val);
+                $type .= '('.max($prevPrecision[0],strlen($parts[0])+max($prevPrecision[1],strlen($parts[1])+2)+2).','.max($prevPrecision[1],strlen($parts[1])+2).') DEFAULT NULL';
+            } else {
+                $prevPrecision = (is_null($prevType)) ? array(12,6) : $this->getDecimalPrecisions($prevType);
+                $type = 'DECIMAL('.max($prevPrecision[0],strlen($val)+$prevPrecision[1]+4).','.$prevPrecision[1].') DEFAULT NULL';
+            }
+        } else if($prevTypeSimple === 'VARCHAR'){
+            $precision = max(strlen($val)+256,$this->getVarcharPrecision($prevType));
+            $type = 'VARCHAR('.$precision.') DEFAULT NULL'; // Always default to a semi-long varchar - that's a pretty safe bet.
+        } else {
+            $type = 'VARCHAR('.(strlen($val)+256).') DEFAULT NULL'; // Always default to a semi-long varchar - that's a pretty safe bet.
+        }
+        return $type;
+    }
+
+    /**
+     * Get the precision from a type definition (e.g. VARCHAR(256)) returns 256)
+     * @param  string $type The type definition
+     * @return int          The precision
+     */
+    public function getVarcharPrecision($type){
+        preg_match_all("/[0-9]+/", $type, $output_array);
+        return intval($output_array[0][0]);
+    }
+
+    /**
+     * Get the precision from a type definition (e.g. DECIMAL(12,6) returns array(12,6))
+     * @param  string $type The type definition
+     * @return array        The precisions in array format, e.g. DECIMAL(5,18) returns array(5,17)
+     */
+    public function getDecimalPrecisions($type){
+        preg_match_all("/[0-9]+/", $type, $output_array);
+        return array_map('intval',array_replace(array(12,6),$output_array[0]));
+    }
+
+    /**
+     * Get the number of digits in an integer
+     * @param  int $num An integer
+     * @return int      The number of digits
+     */
+    public function getNumberLength($num){
+        $num = (string)$num;
+        $num = count(str_split ($num));
+        return $num;
     }
 
     /**
