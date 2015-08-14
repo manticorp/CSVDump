@@ -446,7 +446,7 @@ EOF;
                 $type = 'VARCHAR(512) DEFAULT NULL';
             } else if (strpos($val,".") !== false) { // Check for decimals
                 $prevPrecision = (is_null($prevType)) ? array(12,6) : $this->getDecimalPrecisions($prevType);
-                print_r($prevPrecision);echo "\n";
+                // print_r($prevPrecision);echo "\n";
                 $type = 'DECIMAL';
                 $parts = explode('.',$val);
                 $type .= '('.max($prevPrecision[0],strlen($parts[0])+max($prevPrecision[1],strlen($parts[1])+2)+2).','.max($prevPrecision[1],strlen($parts[1])+2).') DEFAULT NULL';
