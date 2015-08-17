@@ -4,6 +4,7 @@ window.hasError = false;
 window.finished = false;
 window.pollingPeriod = 1000;
 window.updatePeriod = 250;
+window.fileCheckUpdatePeriod = 5000;
 window.lastData = null;
 window.lastUpdate;
 window.progressFn = 'var/progress-' + Math.floor(Math.random()*100000) + '.json';
@@ -52,6 +53,9 @@ $(function() {
     $('#inputDb').keyup(updateTableDb);
     $('input[type=text],input[type=number]').keyup(setStoredState);
     $('input, select').change(setStoredState);
+
+    checkFileSizes(false);
+    window.fileCheckIntervalID = setInterval(checkFileSizes, window.fileCheckUpdatePeriod);
 
     // Main file processing process handler
     $('.process-file').click(function() {
@@ -152,6 +156,61 @@ $(function() {
         }, 750);
     });
 });
+
+function checkFileSizes(updated){
+    updated = (updated === undefined) ? true : updated;
+    $('.process-file').each(function(i,el){
+        var fn = decodeURIComponent($(el).data('local-fn'));
+        $.ajax({
+            url: fn,
+            cache: false
+        }).done(function(a){
+            var numLines = getNumLines(a);
+            if($(el).parent().prev().html()/1 !== numLines){
+                $(el).parent().prev().html(numLines);
+                if(updated){
+                    $(el).parent().prev().addClass('file-numlines-updated');
+                }
+            } else if($(el).parent().prev().hasClass('file-numlines-updated')) {
+                $(el).parent().prev().removeClass('file-numlines-updated');
+            }
+            var fileSize = formatBytes(a.length,1,true);
+            if($(el).parent().prev().prev().html() !== fileSize){
+                $(el).parent().prev().prev().html(fileSize);
+                if(updated){
+                    $(el).parent().prev().prev().addClass('file-size-updated');
+                }
+            } else if($(el).parent().prev().prev().hasClass('file-size-updated')) {
+                $(el).parent().prev().prev().removeClass('file-size-updated');
+            }
+        });
+    });
+}
+
+function getNumLines(string) {
+    return (string.match(/\n/g) || []).length;
+}
+
+function formatBytes(bytes, precision, wu) {
+    precision = (precision === undefined) ? 2    : precision;
+    wu        = (wu        === undefined) ? true : wu;
+
+    units = new Array('B', 'KB', 'MB', 'GB', 'TB');
+
+    bytes = Math.max(bytes, 0);
+    pow = Math.floor((bytes ? Math.log(bytes) : 0) / Math.log(1024));
+    pow = Math.min(pow, units.length - 1);
+
+    // Uncomment one of the following alternatives
+    bytes /= Math.pow(1024, pow);
+    // bytes /= (1 << (10 * pow));
+
+    var ppow = Math.pow(10,precision);
+    r = (Math.round(bytes * ppow)/ppow).toFixed(precision);
+    if(wu) r += ' ' + units[pow];
+
+    return r;
+}
 
 function setStoredState() {
     console.log('setStoredState');

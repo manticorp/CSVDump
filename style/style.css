@@ -231,3 +231,15 @@ button:active,
     color: #ffffff;
   }
 }
+.file-size-updated,
+.file-numlines-updated {
+  color: #003200 !important;
+  background: rgba(0, 255, 0, 0.1) !important;
+}
+.file-size-updated:after,
+.file-numlines-updated:after {
+  content: 'updated!';
+  color: rgba(0, 50, 0, 0.6) !important;
+  display: inline-block;
+  float: right;
+}
