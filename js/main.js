@@ -190,8 +190,8 @@ function createRow(rowid, val, updated) {
         $(this).children('span').toggleClass('glyphicon-chevron-down').toggleClass('glyphicon-chevron-up');
     }));
     $mainRow.append($('<td>'+val.basename+'</td>'));
-    $mainRow.append($('<td>'+val.size+'</td>'));
-    $mainRow.append($('<td>'+val.rowcount+'</td>'));
+    $mainRow.append($('<td class="file-size-updated">'+val.size+'</td>'));
+    $mainRow.append($('<td class="file-numlines-updated">'+val.rowcount+'</td>'));
     $mainRow.append($('<td>').addClass('dump-file').append( $('<a>').attr('href','#script-progress').addClass('process-file').data('jp',false).data('local-fn','input/'+val.basename).data('fn',val.fn).append($('<span><i class="glyphicon glyphicon-import"></i> Dump to <span class="databaseName">databasename</span>.<span class="tableName">tablename</span></span>')) ) );
     $mainRow.append($('<td data-toggle="tooltip" data-placement="top" title="Warning: This will delete the file permanently, it will not be recoverable">').addClass('delete-file').append($('<a>').attr('href','http://'+baseUrl+'?delete=true&fn='+val['data-fn']).append($('<span>Delete File <i class="glyphicon glyphicon-trash"></i> <i class="glyphicon glyphicon-warning-sign"></i></span>')) ));
     var $tbody = $('<tbody>');

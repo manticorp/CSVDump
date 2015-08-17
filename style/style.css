@@ -128,6 +128,13 @@ button:active,
 #file-table .expand {
   cursor: pointer;
 }
+#file-table .main-row > td {
+  -webkit-transition: background-color 1000ms linear;
+  -moz-transition: background-color 1000ms linear;
+  -o-transition: background-color 1000ms linear;
+  -ms-transition: background-color 1000ms linear;
+  transition: background-color 1000ms linear;
+}
 #file-table .secondary-row {
   display: none;
 }
@@ -234,7 +241,7 @@ button:active,
 .file-size-updated,
 .file-numlines-updated {
   color: #003200 !important;
-  background: rgba(0, 255, 0, 0.1) !important;
+  background-color: rgba(0, 255, 0, 0.1) !important;
 }
 .file-size-updated:after,
 .file-numlines-updated:after {
