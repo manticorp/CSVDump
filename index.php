@@ -73,6 +73,7 @@ else: // if(!file_exists('./CSVRunner/Config.php')):
             }
             $processors = CSVRunner::getProcessors();
         ?>
+        <div style="display:none;" data-base-url="<?php echo $baseurl; ?>" id="base-url-php"></div>
         <div class="container">
             <div class="row">
                 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
@@ -144,7 +145,7 @@ else: // if(!file_exists('./CSVRunner/Config.php')):
             <div class="row">
                 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                     <div class="table-responsive" id="file-table">
-                        <table class="table table-hover table-striped">
+                        <table class="table table-hover table-striped" id="main-file-table">
                             <thead>
                                 <tr>
                                     <th></th>
@@ -157,7 +158,7 @@ else: // if(!file_exists('./CSVRunner/Config.php')):
                             </thead>
                             <tbody>
                                 <?php $i = 0; $files = glob(APPLICATION_PATH . '/input/*.csv'); foreach ($files as $fn): $i++; $idBase = CSVRunner::getDBName($fn); ?>
-                                <tr class="main-row">
+                                <tr class="main-row" id="file-row-<?php echo $idBase; ?>">
                                     <td class="expand"><span class="glyphicon glyphicon-chevron-down"></span></td>
                                     <td><?php echo basename($fn);?></td>
                                     <td><?php echo CSVRunner::fileSizeString($fn, 1);?></td>

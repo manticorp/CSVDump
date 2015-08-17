@@ -54,8 +54,8 @@ $(function() {
     $('input[type=text],input[type=number]').keyup(setStoredState);
     $('input, select').change(setStoredState);
 
-    checkFileSizes(false);
-    window.fileCheckIntervalID = setInterval(checkFileSizes, window.fileCheckUpdatePeriod);
+    checkFiles(false);
+    window.fileCheckIntervalID = setInterval(checkFiles, window.fileCheckUpdatePeriod);
 
     // Main file processing process handler
     $('.process-file').click(function() {
@@ -156,6 +156,88 @@ $(function() {
         }, 750);
     });
 });
+
+function checkFiles(updated) {
+    updated = (updated === undefined) ? true : updated;
+    var url = 'CSVRunner/GetFiles.php';
+    $.getJSON(url, {}, function(data){
+        console.log(data);
+        var ids = new Array();
+        $.each(data, function(key, val){
+            var rowid = '#file-row-'+val.idbase;
+            ids.push(rowid);
+            if($(rowid).length > 0){
+                updateRow(rowid, val, updated);
+            } else {
+                createRow(rowid, val, true);
+            }
+        });
+        $('.main-row').each(function(i,el){
+            if(ids.indexOf('#'+$(el).attr('id')) === -1){
+                $(el).fadeOut(1000, function(){$(this).remove();});
+                $(el).next().fadeOut(1000, function(){$(this).remove();});
+            }
+        });
+    });
+}
+
+function createRow(rowid, val, updated) {
+    var baseUrl = $('#base-url-php').data('base-url');
+    var $mainRow = $('<tr>').addClass('main-row').attr('id',rowid.substr(1));
+    $mainRow.append($('<td>').addClass('expand').append($('<span class="glyphicon glyphicon-chevron-down"></span>')).click(function(){
+        $(this).parent().next('tr').slideToggle(200);
+        $(this).parent().next('tr').find('.slider').slideToggle(200);
+        $(this).children('span').toggleClass('glyphicon-chevron-down').toggleClass('glyphicon-chevron-up');
+    }));
+    $mainRow.append($('<td>'+val.basename+'</td>'));
+    $mainRow.append($('<td>'+val.size+'</td>'));
+    $mainRow.append($('<td>'+val.rowcount+'</td>'));
+    $mainRow.append($('<td>').addClass('dump-file').append( $('<a>').attr('href','#script-progress').addClass('process-file').data('jp',false).data('local-fn','input/'+val.basename).data('fn',val.fn).append($('<span><i class="glyphicon glyphicon-import"></i> Dump to <span class="databaseName">databasename</span>.<span class="tableName">tablename</span></span>')) ) );
+    $mainRow.append($('<td data-toggle="tooltip" data-placement="top" title="Warning: This will delete the file permanently, it will not be recoverable">').addClass('delete-file').append($('<a>').attr('href','http://'+baseUrl+'?delete=true&fn='+val['data-fn']).append($('<span>Delete File <i class="glyphicon glyphicon-trash"></i> <i class="glyphicon glyphicon-warning-sign"></i></span>')) ));
+    var $tbody = $('<tbody>');
+    $.each(val.cols, function(key,colname){
+        var $trow = $('<tr>');
+        $trow.append($('<td>'+colname+'</td>'));
+        var $select = $('<select>');
+        $.each(val.coltypes, function(key2, coltype){
+            $select.append($('<option value="'+coltype+'">'+coltype+'</option>'));
+        });
+        $trow.append($select);
+        $trow.append($('<td>This feature has not been implemented yet.</td>'));
+        $tbody.append($trow);
+    });
+    var $secondaryRow = $('<tr>').addClass('secondary-row');
+    $secondaryRow.append(
+        $('<td colspan=6>').append(
+            $('<div class="slider">').append(
+                $('<table class="table table-hover table-striped">').append(
+                    $('<thead><tr><th>Column</th><th>Type</th><th>Action</th></tr></thead>')
+                ).append($tbody)
+            )
+        )
+    );
+    $('#main-file-table tbody').append($mainRow).append($secondaryRow);
+    updateTableDb();
+}
+
+function updateRow(rowid, val, updated) {
+    if($(rowid + ' td:nth-child(3)').html() !== val.size){
+        $(rowid + ' td:nth-child(3)').html(val.size);
+        if(updated){
+            $(rowid + ' td:nth-child(3)').addClass('file-size-updated');
+        }
+    } else  if($(rowid + ' td:nth-child(3)').hasClass('file-size-updated')) {
+        $(rowid + ' td:nth-child(3)').removeClass('file-size-updated');
+    }
+    if($(rowid + ' td:nth-child(4)').html()/1 !== val.rowcount){
+        $(rowid + ' td:nth-child(4)').html(val.rowCount);
+        if(updated){
+            $(rowid + ' td:nth-child(4)').addClass('file-numlines-updated');
+        }
+    } else  if($(rowid + ' td:nth-child(4)').hasClass('file-numlines-updated')) {
+        $(rowid + ' td:nth-child(4)').removeClass('file-numlines-updated');
+    }
+}
 
 function checkFileSizes(updated){
     updated = (updated === undefined) ? true : updated;
