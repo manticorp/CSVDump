@@ -34,7 +34,7 @@ then point your browser to:
 4. Type your database name
 5. Click on '**Dump to database.tablename**'
 
-![Screenshot of basic screen](http://i.imgur.com/bCyOLBN.png)
+![Screenshot of basic screen](http://i.imgur.com/VwzOOxC.png)
 
 ### Advanced Usage
 
@@ -172,4 +172,4 @@ For the add/modifyColumn usage, I suggest looking either at the [example process
 
 Using the processor is simple, just select it in the 'Processor' dropdown box and run the dump as normal:
 
-![Using a Processor](http://i.imgur.com/lwNK6QR.png)
+![Using a Processor](http://i.imgur.com/IoY3dog.png)

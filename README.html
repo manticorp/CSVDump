@@ -906,7 +906,7 @@ body .markdown-body
 <li>Click on '<strong>Dump to database.tablename</strong>'</li>
 </ol>
 
-<p><a href="https://camo.githubusercontent.com/aba96c79ae4be48878bb5f7ee816dde098837ec6/687474703a2f2f692e696d6775722e636f6d2f6243794f4c424e2e706e67" target="_blank"><img src="https://camo.githubusercontent.com/aba96c79ae4be48878bb5f7ee816dde098837ec6/687474703a2f2f692e696d6775722e636f6d2f6243794f4c424e2e706e67" alt="Screenshot of basic screen" data-canonical-src="http://i.imgur.com/bCyOLBN.png" style="max-width:100%;"></a></p>
+<p><a href="https://camo.githubusercontent.com/0398846c81ca8783c513111568f19e4be71721d9/687474703a2f2f692e696d6775722e636f6d2f56777a4f4f78432e706e67" target="_blank"><img src="https://camo.githubusercontent.com/0398846c81ca8783c513111568f19e4be71721d9/687474703a2f2f692e696d6775722e636f6d2f56777a4f4f78432e706e67" alt="Screenshot of basic screen" data-canonical-src="http://i.imgur.com/VwzOOxC.png" style="max-width:100%;"></a></p>
 
 <h3>
 <a id="user-content-advanced-usage" class="anchor" href="#advanced-usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Advanced Usage</h3>
@@ -928,60 +928,60 @@ body .markdown-body
 
 <p>File: <code>/Core/Processor/Row/MyRowProcessor.php</code></p>
 
-<div class="highlight highlight-php"><pre><span class="pl-pse">&lt;?php</span><span class="pl-s2"></span>
-<span class="pl-s2"><span class="pl-k">include</span> <span class="pl-s1"><span class="pl-pds">"</span>Abstract.php<span class="pl-pds">"</span></span>;</span>
-<span class="pl-s2"></span>
-<span class="pl-s2"><span class="pl-c">/**</span></span>
-<span class="pl-s2"><span class="pl-c"> * Processor_Row_MyRowProcessor</span></span>
-<span class="pl-s2"><span class="pl-c"> */</span></span>
-<span class="pl-s2"><span class="pl-st">class</span> <span class="pl-en">Processor_Row_MyRowProcessor</span> <span class="pl-s">extends</span> <span class="pl-e">Processor_Row_Abstract</span></span>
-<span class="pl-s2">{</span>
-<span class="pl-s2">    <span class="pl-c">/**</span></span>
-<span class="pl-s2"><span class="pl-c">     * process the row</span></span>
-<span class="pl-s2"><span class="pl-c">     * <span class="pl-k">@param</span>  array $row the row</span></span>
-<span class="pl-s2"><span class="pl-c">     * <span class="pl-k">@return</span> array $row the modified row</span></span>
-<span class="pl-s2"><span class="pl-c">     */</span></span>
-<span class="pl-s2">    <span class="pl-s">public</span> <span class="pl-st">function</span> <span class="pl-en">process</span>(<span class="pl-vo">$row</span>)</span>
-<span class="pl-s2">    {</span>
-<span class="pl-s2">        <span class="pl-vo">$row</span>[<span class="pl-s1"><span class="pl-pds">'</span>title<span class="pl-pds">'</span></span>] <span class="pl-k">=</span> <span class="pl-s3">strtoupper</span>(<span class="pl-vo">$row</span>[<span class="pl-s1"><span class="pl-pds">'</span>title<span class="pl-pds">'</span></span>]);</span>
-<span class="pl-s2">        <span class="pl-k">return</span> <span class="pl-vo">$row</span>;</span>
-<span class="pl-s2">    }</span>
-<span class="pl-s2">}</span></pre></div>
+<div class="highlight highlight-php"><pre><span class="pl-pse">&lt;?php</span><span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>Abstract.php<span class="pl-pds">"</span></span>;</span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-c">/**</span></span>
+<span class="pl-s1"><span class="pl-c"> * Processor_Row_MyRowProcessor</span></span>
+<span class="pl-s1"><span class="pl-c"> */</span></span>
+<span class="pl-s1"><span class="pl-k">class</span> <span class="pl-en">Processor_Row_MyRowProcessor</span> <span class="pl-k">extends</span> <span class="pl-e">Processor_Row_Abstract</span></span>
+<span class="pl-s1">{</span>
+<span class="pl-s1">    <span class="pl-c">/**</span></span>
+<span class="pl-s1"><span class="pl-c">     * process the row</span></span>
+<span class="pl-s1"><span class="pl-c">     * <span class="pl-k">@param</span>  array $row the row</span></span>
+<span class="pl-s1"><span class="pl-c">     * <span class="pl-k">@return</span> array $row the modified row</span></span>
+<span class="pl-s1"><span class="pl-c">     */</span></span>
+<span class="pl-s1">    <span class="pl-k">public</span> <span class="pl-k">function</span> <span class="pl-en">process</span>(<span class="pl-smi">$row</span>)</span>
+<span class="pl-s1">    {</span>
+<span class="pl-s1">        <span class="pl-smi">$row</span>[<span class="pl-s"><span class="pl-pds">'</span>title<span class="pl-pds">'</span></span>] <span class="pl-k">=</span> <span class="pl-c1">strtoupper</span>(<span class="pl-smi">$row</span>[<span class="pl-s"><span class="pl-pds">'</span>title<span class="pl-pds">'</span></span>]);</span>
+<span class="pl-s1">        <span class="pl-k">return</span> <span class="pl-smi">$row</span>;</span>
+<span class="pl-s1">    }</span>
+<span class="pl-s1">}</span></pre></div>
 
 <p>You can use the row processor to do any field by field or row by row processing.</p>
 
-<div class="highlight highlight-php"><pre><span class="pl-pse">&lt;?php</span><span class="pl-s2"></span>
-<span class="pl-s2"><span class="pl-k">include</span> <span class="pl-s1"><span class="pl-pds">"</span>Abstract.php<span class="pl-pds">"</span></span>;</span>
-<span class="pl-s2"></span>
-<span class="pl-s2"><span class="pl-c">/**</span></span>
-<span class="pl-s2"><span class="pl-c"> * Processor_Row_MyRowProcessor</span></span>
-<span class="pl-s2"><span class="pl-c"> */</span></span>
-<span class="pl-s2"><span class="pl-st">class</span> <span class="pl-en">Processor_Row_MyRowProcessor</span> <span class="pl-s">extends</span> <span class="pl-e">Processor_Row_Abstract</span></span>
-<span class="pl-s2">{</span>
-<span class="pl-s2">    <span class="pl-c">/**</span></span>
-<span class="pl-s2"><span class="pl-c">     * process the row</span></span>
-<span class="pl-s2"><span class="pl-c">     * <span class="pl-k">@param</span>  array $row the row</span></span>
-<span class="pl-s2"><span class="pl-c">     * <span class="pl-k">@return</span> array $row the modified row</span></span>
-<span class="pl-s2"><span class="pl-c">     */</span></span>
-<span class="pl-s2">    <span class="pl-s">public</span> <span class="pl-st">function</span> <span class="pl-en">process</span>(<span class="pl-vo">$row</span>)</span>
-<span class="pl-s2">    {</span>
-<span class="pl-s2">        <span class="pl-vo">$row</span>[<span class="pl-s1"><span class="pl-pds">'</span>title<span class="pl-pds">'</span></span>] <span class="pl-k">=</span> <span class="pl-vo">$this</span><span class="pl-k">-&gt;</span>titleCase(<span class="pl-vo">$row</span>[<span class="pl-s1"><span class="pl-pds">'</span>title<span class="pl-pds">'</span></span>]);</span>
-<span class="pl-s2">        <span class="pl-vo">$row</span>[<span class="pl-s1"><span class="pl-pds">'</span>combinedTitleDescription<span class="pl-pds">'</span></span>] <span class="pl-k">=</span></span>
-<span class="pl-s2">            <span class="pl-vo">$row</span>[<span class="pl-s1"><span class="pl-pds">'</span>title<span class="pl-pds">'</span></span>] <span class="pl-k">.</span> <span class="pl-s1"><span class="pl-pds">'</span> <span class="pl-pds">'</span></span> <span class="pl-k">.</span> <span class="pl-vo">$row</span>[<span class="pl-s1"><span class="pl-pds">'</span>description<span class="pl-pds">'</span></span>];</span>
-<span class="pl-s2">        <span class="pl-k">return</span> <span class="pl-vo">$row</span>;</span>
-<span class="pl-s2">    }</span>
-<span class="pl-s2"></span>
-<span class="pl-s2">    <span class="pl-c">/**</span></span>
-<span class="pl-s2"><span class="pl-c">     * Converts a string to Title Case</span></span>
-<span class="pl-s2"><span class="pl-c">     * </span></span>
-<span class="pl-s2"><span class="pl-c">     * <span class="pl-k">@param</span>  string  $str  The string to be titlecased</span></span>
-<span class="pl-s2"><span class="pl-c">     * <span class="pl-k">@return</span> string        The modified string</span></span>
-<span class="pl-s2"><span class="pl-c">     */</span></span>
-<span class="pl-s2">    <span class="pl-s">private</span> <span class="pl-st">function</span> <span class="pl-en">titleCase</span>(<span class="pl-vo">$str</span>)</span>
-<span class="pl-s2">    {</span>
-<span class="pl-s2">        <span class="pl-k">return</span> <span class="pl-s3">ucwords</span>(<span class="pl-s3">strtolower</span>(<span class="pl-vo">$str</span>));</span>
-<span class="pl-s2">    }</span>
-<span class="pl-s2">}</span></pre></div>
+<div class="highlight highlight-php"><pre><span class="pl-pse">&lt;?php</span><span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>Abstract.php<span class="pl-pds">"</span></span>;</span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-c">/**</span></span>
+<span class="pl-s1"><span class="pl-c"> * Processor_Row_MyRowProcessor</span></span>
+<span class="pl-s1"><span class="pl-c"> */</span></span>
+<span class="pl-s1"><span class="pl-k">class</span> <span class="pl-en">Processor_Row_MyRowProcessor</span> <span class="pl-k">extends</span> <span class="pl-e">Processor_Row_Abstract</span></span>
+<span class="pl-s1">{</span>
+<span class="pl-s1">    <span class="pl-c">/**</span></span>
+<span class="pl-s1"><span class="pl-c">     * process the row</span></span>
+<span class="pl-s1"><span class="pl-c">     * <span class="pl-k">@param</span>  array $row the row</span></span>
+<span class="pl-s1"><span class="pl-c">     * <span class="pl-k">@return</span> array $row the modified row</span></span>
+<span class="pl-s1"><span class="pl-c">     */</span></span>
+<span class="pl-s1">    <span class="pl-k">public</span> <span class="pl-k">function</span> <span class="pl-en">process</span>(<span class="pl-smi">$row</span>)</span>
+<span class="pl-s1">    {</span>
+<span class="pl-s1">        <span class="pl-smi">$row</span>[<span class="pl-s"><span class="pl-pds">'</span>title<span class="pl-pds">'</span></span>] <span class="pl-k">=</span> <span class="pl-smi">$this</span><span class="pl-k">-&gt;</span>titleCase(<span class="pl-smi">$row</span>[<span class="pl-s"><span class="pl-pds">'</span>title<span class="pl-pds">'</span></span>]);</span>
+<span class="pl-s1">        <span class="pl-smi">$row</span>[<span class="pl-s"><span class="pl-pds">'</span>combinedTitleDescription<span class="pl-pds">'</span></span>] <span class="pl-k">=</span></span>
+<span class="pl-s1">            <span class="pl-smi">$row</span>[<span class="pl-s"><span class="pl-pds">'</span>title<span class="pl-pds">'</span></span>] <span class="pl-k">.</span> <span class="pl-s"><span class="pl-pds">'</span> <span class="pl-pds">'</span></span> <span class="pl-k">.</span> <span class="pl-smi">$row</span>[<span class="pl-s"><span class="pl-pds">'</span>description<span class="pl-pds">'</span></span>];</span>
+<span class="pl-s1">        <span class="pl-k">return</span> <span class="pl-smi">$row</span>;</span>
+<span class="pl-s1">    }</span>
+<span class="pl-s1"></span>
+<span class="pl-s1">    <span class="pl-c">/**</span></span>
+<span class="pl-s1"><span class="pl-c">     * Converts a string to Title Case</span></span>
+<span class="pl-s1"><span class="pl-c">     * </span></span>
+<span class="pl-s1"><span class="pl-c">     * <span class="pl-k">@param</span>  string  $str  The string to be titlecased</span></span>
+<span class="pl-s1"><span class="pl-c">     * <span class="pl-k">@return</span> string        The modified string</span></span>
+<span class="pl-s1"><span class="pl-c">     */</span></span>
+<span class="pl-s1">    <span class="pl-k">private</span> <span class="pl-k">function</span> <span class="pl-en">titleCase</span>(<span class="pl-smi">$str</span>)</span>
+<span class="pl-s1">    {</span>
+<span class="pl-s1">        <span class="pl-k">return</span> <span class="pl-c1">ucwords</span>(<span class="pl-c1">strtolower</span>(<span class="pl-smi">$str</span>));</span>
+<span class="pl-s1">    }</span>
+<span class="pl-s1">}</span></pre></div>
 
 <h3>
 <a id="user-content-database-processing" class="anchor" href="#database-processing" aria-hidden="true"><span class="octicon octicon-link"></span></a>Database Processing</h3>
@@ -990,33 +990,33 @@ body .markdown-body
 
 <p>Example: /Core/Processor/DB/MyDBProcessor.php</p>
 
-<div class="highlight highlight-php"><pre><span class="pl-pse">&lt;?php</span><span class="pl-s2"></span>
-<span class="pl-s2"><span class="pl-k">include</span> <span class="pl-s1"><span class="pl-pds">"</span>Abstract.php<span class="pl-pds">"</span></span>;</span>
-<span class="pl-s2"></span>
-<span class="pl-s2"><span class="pl-c">/**</span></span>
-<span class="pl-s2"><span class="pl-c"> * Processor_DB_MyDBProcessor</span></span>
-<span class="pl-s2"><span class="pl-c"> */</span></span>
-<span class="pl-s2"><span class="pl-st">class</span> <span class="pl-en">Processor_DB_MyDBProcessor</span> <span class="pl-s">extends</span> <span class="pl-e">Processor_DB_Abstract</span></span>
-<span class="pl-s2">{</span>
-<span class="pl-s2">    <span class="pl-s">public</span> <span class="pl-st">function</span> <span class="pl-en">preImport</span>(){</span>
-<span class="pl-s2">        <span class="pl-vo">$SQL</span>  <span class="pl-k">=</span> <span class="pl-s1"><span class="pl-pds">"</span><span class="pl-s2">ALTER TABLE <span class="pl-s1">`</span></span><span class="pl-pds">"</span></span><span class="pl-k">.</span><span class="pl-vo">$this</span><span class="pl-k">-&gt;</span>getTableName()<span class="pl-k">.</span><span class="pl-s1"><span class="pl-pds">"</span>` <span class="pl-pds">"</span></span>;</span>
-<span class="pl-s2">        <span class="pl-vo">$SQL</span> <span class="pl-k">.=</span> <span class="pl-s1"><span class="pl-pds">"</span>ADD `TEST ADD COL` VARCHAR(255) NULL DEFAULT NULL ;<span class="pl-pds">"</span></span>;</span>
-<span class="pl-s2">        <span class="pl-k">try</span>{</span>
-<span class="pl-s2">            <span class="pl-vo">$this</span><span class="pl-k">-&gt;</span>query(<span class="pl-vo">$SQL</span>, <span class="pl-c1">true</span>);</span>
-<span class="pl-s2">        } <span class="pl-k">catch</span> (<span class="pl-s3">\</span><span class="pl-s3">Exception</span> <span class="pl-vo">$e</span>){</span>
-<span class="pl-s2">            <span class="pl-c">// do nothing, this is okay because on multiple imports it might fail on</span></span>
-<span class="pl-s2">            <span class="pl-c">// the second import when the column already exists.</span></span>
-<span class="pl-s2">        }</span>
-<span class="pl-s2">        <span class="pl-k">return</span> <span class="pl-vo">$this</span>;</span>
-<span class="pl-s2">    }</span>
-<span class="pl-s2"></span>
-<span class="pl-s2">    <span class="pl-s">public</span> <span class="pl-st">function</span> <span class="pl-en">postImport</span>(){</span>
-<span class="pl-s2">        <span class="pl-vo">$SQL</span>  <span class="pl-k">=</span> <span class="pl-s1"><span class="pl-pds">"</span><span class="pl-s2"><span class="pl-k">UPDATE</span> <span class="pl-s1">`</span></span><span class="pl-pds">"</span></span><span class="pl-k">.</span><span class="pl-vo">$this</span><span class="pl-k">-&gt;</span>getTableName()<span class="pl-k">.</span><span class="pl-s1"><span class="pl-pds">"</span>` SET <span class="pl-pds">"</span></span>;</span>
-<span class="pl-s2">        <span class="pl-vo">$SQL</span> <span class="pl-k">.=</span> <span class="pl-s1"><span class="pl-pds">"</span>`TEST ADD COL`='TEST';<span class="pl-pds">"</span></span>;</span>
-<span class="pl-s2">        <span class="pl-vo">$this</span><span class="pl-k">-&gt;</span>query(<span class="pl-vo">$SQL</span>);</span>
-<span class="pl-s2">        <span class="pl-k">return</span> <span class="pl-vo">$this</span>;</span>
-<span class="pl-s2">    }</span>
-<span class="pl-s2">}</span></pre></div>
+<div class="highlight highlight-php"><pre><span class="pl-pse">&lt;?php</span><span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>Abstract.php<span class="pl-pds">"</span></span>;</span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-c">/**</span></span>
+<span class="pl-s1"><span class="pl-c"> * Processor_DB_MyDBProcessor</span></span>
+<span class="pl-s1"><span class="pl-c"> */</span></span>
+<span class="pl-s1"><span class="pl-k">class</span> <span class="pl-en">Processor_DB_MyDBProcessor</span> <span class="pl-k">extends</span> <span class="pl-e">Processor_DB_Abstract</span></span>
+<span class="pl-s1">{</span>
+<span class="pl-s1">    <span class="pl-k">public</span> <span class="pl-k">function</span> <span class="pl-en">preImport</span>(){</span>
+<span class="pl-s1">        <span class="pl-smi">$SQL</span>  <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span><span class="pl-s1">ALTER TABLE <span class="pl-s">`</span></span><span class="pl-pds">"</span></span><span class="pl-k">.</span><span class="pl-smi">$this</span><span class="pl-k">-&gt;</span>getTableName()<span class="pl-k">.</span><span class="pl-s"><span class="pl-pds">"</span>` <span class="pl-pds">"</span></span>;</span>
+<span class="pl-s1">        <span class="pl-smi">$SQL</span> <span class="pl-k">.=</span> <span class="pl-s"><span class="pl-pds">"</span>ADD `TEST ADD COL` VARCHAR(255) NULL DEFAULT NULL ;<span class="pl-pds">"</span></span>;</span>
+<span class="pl-s1">        <span class="pl-k">try</span>{</span>
+<span class="pl-s1">            <span class="pl-smi">$this</span><span class="pl-k">-&gt;</span>query(<span class="pl-smi">$SQL</span>, <span class="pl-c1">true</span>);</span>
+<span class="pl-s1">        } <span class="pl-k">catch</span> (<span class="pl-c1">\</span><span class="pl-c1">Exception</span> <span class="pl-smi">$e</span>){</span>
+<span class="pl-s1">            <span class="pl-c">// do nothing, this is okay because on multiple imports it might fail on</span></span>
+<span class="pl-s1">            <span class="pl-c">// the second import when the column already exists.</span></span>
+<span class="pl-s1">        }</span>
+<span class="pl-s1">        <span class="pl-k">return</span> <span class="pl-smi">$this</span>;</span>
+<span class="pl-s1">    }</span>
+<span class="pl-s1"></span>
+<span class="pl-s1">    <span class="pl-k">public</span> <span class="pl-k">function</span> <span class="pl-en">postImport</span>(){</span>
+<span class="pl-s1">        <span class="pl-smi">$SQL</span>  <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span><span class="pl-s1"><span class="pl-k">UPDATE</span> <span class="pl-s">`</span></span><span class="pl-pds">"</span></span><span class="pl-k">.</span><span class="pl-smi">$this</span><span class="pl-k">-&gt;</span>getTableName()<span class="pl-k">.</span><span class="pl-s"><span class="pl-pds">"</span>` SET <span class="pl-pds">"</span></span>;</span>
+<span class="pl-s1">        <span class="pl-smi">$SQL</span> <span class="pl-k">.=</span> <span class="pl-s"><span class="pl-pds">"</span>`TEST ADD COL`='TEST';<span class="pl-pds">"</span></span>;</span>
+<span class="pl-s1">        <span class="pl-smi">$this</span><span class="pl-k">-&gt;</span>query(<span class="pl-smi">$SQL</span>);</span>
+<span class="pl-s1">        <span class="pl-k">return</span> <span class="pl-smi">$this</span>;</span>
+<span class="pl-s1">    }</span>
+<span class="pl-s1">}</span></pre></div>
 
 <p>In addition there are some convenience functions defined for creating/modifying/deleting columns and other general query related things:</p>
 
@@ -1086,5 +1086,5 @@ body .markdown-body
 
 <p>Using the processor is simple, just select it in the 'Processor' dropdown box and run the dump as normal:</p>
 
-<p><a href="https://camo.githubusercontent.com/dfa7e6785b0a4e0f48a1c77648ea63be14ff9ba2/687474703a2f2f692e696d6775722e636f6d2f6c774e4b3651522e706e67" target="_blank"><img src="https://camo.githubusercontent.com/dfa7e6785b0a4e0f48a1c77648ea63be14ff9ba2/687474703a2f2f692e696d6775722e636f6d2f6c774e4b3651522e706e67" alt="Using a Processor" data-canonical-src="http://i.imgur.com/lwNK6QR.png" style="max-width:100%;"></a></p>
+<p><a href="https://camo.githubusercontent.com/af2802a9c0909a7112555a0753713de6b38dd46a/687474703a2f2f692e696d6775722e636f6d2f496f5933646f672e706e67" target="_blank"><img src="https://camo.githubusercontent.com/af2802a9c0909a7112555a0753713de6b38dd46a/687474703a2f2f692e696d6775722e636f6d2f496f5933646f672e706e67" alt="Using a Processor" data-canonical-src="http://i.imgur.com/IoY3dog.png" style="max-width:100%;"></a></p>
 </article></body></html>
