@@ -160,24 +160,35 @@ $(function() {
 function checkFiles(updated) {
     updated = (updated === undefined) ? true : updated;
     var url = 'CSVRunner/GetFiles.php';
-    $.getJSON(url, {}, function(data){
-        console.log(data);
-        var ids = new Array();
-        $.each(data, function(key, val){
-            var rowid = '#file-row-'+val.idbase;
-            ids.push(rowid);
-            if($(rowid).length > 0){
-                updateRow(rowid, val, updated);
-            } else {
-                createRow(rowid, val, true);
-            }
-        });
-        $('.main-row').each(function(i,el){
-            if(ids.indexOf('#'+$(el).attr('id')) === -1){
-                $(el).fadeOut(1000, function(){$(this).remove();});
-                $(el).next().fadeOut(1000, function(){$(this).remove();});
-            }
-        });
+    $.ajax({
+        cache: false,
+        url: url,
+        dataType: "json",
+        success: function(data){
+            console.log(data);
+            $('.file-size-updated').each(function(i,e){
+                $(e).removeClass('file-size-updated');
+            });
+            $('.file-numlines-updated').each(function(i,e){
+                $(e).removeClass('file-numlines-updated');
+            });
+            var ids = new Array();
+            $.each(data, function(key, val){
+                var rowid = '#file-row-'+val.idbase;
+                ids.push(rowid);
+                if($(rowid).length > 0){
+                    updateRow(rowid, val, updated);
+                } else {
+                    createRow(rowid, val, true);
+                }
+            });
+            $('.main-row').each(function(i,el){
+                if(ids.indexOf('#'+$(el).attr('id')) === -1){
+                    $(el).fadeOut(1000, function(){$(this).remove();});
+                    $(el).next().fadeOut(1000, function(){$(this).remove();});
+                }
+            });
+        }
     });
 }
 
@@ -229,8 +240,8 @@ function updateRow(rowid, val, updated) {
     } else  if($(rowid + ' td:nth-child(3)').hasClass('file-size-updated')) {
         $(rowid + ' td:nth-child(3)').removeClass('file-size-updated');
     }
-    if($(rowid + ' td:nth-child(4)').html()/1 !== val.rowcount){
-        $(rowid + ' td:nth-child(4)').html(val.rowCount);
+    if(($(rowid + ' td:nth-child(4)').html()/1) !== (val.rowcount/1)){
+        $(rowid + ' td:nth-child(4)').html(val.rowcount);
         if(updated){
             $(rowid + ' td:nth-child(4)').addClass('file-numlines-updated');
         }
