@@ -36,6 +36,12 @@ then point your browser to:
 
 ![Screenshot of basic screen](http://i.imgur.com/VwzOOxC.png)
 
+### Selecting Column Types
+
+CSVDump tries to automatically guess the column types for your data - it can be particularly good with numerical columns vs text columns, and 99% of the time it works fine - but if you want to explicity tell it what type a column should be, you can expand a row on the file table to explicitly tell CSVDump what type a column is:
+
+![Selecting column data types](http://i.imgur.com/7ubI7z9.png)
+
 ### Advanced Usage
 
 CSVDump allows you to do several things that are unavailable in lots of other CSV dumping tools, including row by row processing and pre and post import database functions.
