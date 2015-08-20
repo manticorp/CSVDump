@@ -265,6 +265,7 @@ EOF;
 
         // We're all done!
         $msg = 'Totally Completed';
+        $this->setSuccess(true);
         $this->pu->totallyComplete($msg);
 
         return $this;
@@ -788,7 +789,17 @@ EOF;
             if($headerCount !== count($csv) && count($csv) == 1 && trim($csv[0]) == ''){
                 continue;
             }
-            $csv = array_combine($headers,$csv);
+            if($headerCount !== count($csv)){
+                $msg  = "Number of columns in line $i doesn't match number of headers (".count($csv)." vs ".$headerCount.").".PHP_EOL.PHP_EOL;
+                $msg .= "Aborting Import".PHP_EOL.PHP_EOL;
+                $maxLenString = max(max(array_map('strlen',$headers)),max(array_map('strlen',$csv)));
+                $msg .= "Headers: ".vsprintf(str_repeat('%-'.$maxLenString.'s', count($headers) ), $headers ).PHP_EOL;
+                $msg .= "Line:    ".vsprintf(str_repeat('%-'.$maxLenString.'s', count($csv)     ), $csv     ).PHP_EOL;
+                trigger_error($msg, E_USER_ERROR);
+                break;
+            } else {
+                $csv = array_combine($headers,$csv);
+            }
             $output[] = $csv;
         }
         $csv = $output;
@@ -862,17 +873,26 @@ EOF;
         $row = $file->fgetcsv();
         return $row;
     }
+
+    public function getSuccess(){
+        return $this->success;
+    }
+
+    public function setSuccess($success){
+        $this->success = $success;
+        return $this;
+    }
 }
 
 function shutdown()
 {
-    global $success;
-    if (isset($success) && $success === false) {
+    global $csvRunner;
+    if (isset($csvRunner) && $csvRunner->getSuccess() === false) {
         $msg = '';
         $mmu = memory_get_peak_usage();
-        $msg = sprintf("Max memory usage: %s", formatBytes($mmu, 1));
+        $msg = sprintf("Max memory usage: %s", CSVRunner::formatBytes($mmu, 1));
     }
-    if (isset($_GET['print'])) {
+    if (isset($_GET['print']) && isset($msg)) {
         echo '<pre>' . $msg . '</pre>';
     }
 }
