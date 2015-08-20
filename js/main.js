@@ -210,6 +210,7 @@ function createRow(rowid, val, updated) {
         var $trow = $('<tr>');
         $trow.append($('<td>'+colname+'</td>'));
         var $select = $('<select>');
+        $select.append($('<option value="">Auto Detect</option>'));
         $.each(val.coltypes, function(key2, coltype){
             $select.append($('<option value="'+coltype+'">'+coltype+'</option>'));
         });

@@ -5,6 +5,25 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Load CSV</title>
+
+        <link rel="apple-touch-icon" sizes="57x57" href="apple-touch-icon-57x57.png">
+        <link rel="apple-touch-icon" sizes="60x60" href="apple-touch-icon-60x60.png">
+        <link rel="apple-touch-icon" sizes="72x72" href="apple-touch-icon-72x72.png">
+        <link rel="apple-touch-icon" sizes="76x76" href="apple-touch-icon-76x76.png">
+        <link rel="apple-touch-icon" sizes="114x114" href="apple-touch-icon-114x114.png">
+        <link rel="apple-touch-icon" sizes="120x120" href="apple-touch-icon-120x120.png">
+        <link rel="apple-touch-icon" sizes="144x144" href="apple-touch-icon-144x144.png">
+        <link rel="apple-touch-icon" sizes="152x152" href="apple-touch-icon-152x152.png">
+        <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon-180x180.png">
+        <link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32">
+        <link rel="icon" type="image/png" href="android-chrome-192x192.png" sizes="192x192">
+        <link rel="icon" type="image/png" href="favicon-96x96.png" sizes="96x96">
+        <link rel="icon" type="image/png" href="favicon-16x16.png" sizes="16x16">
+        <link rel="manifest" href="manifest.json">
+        <meta name="msapplication-TileColor" content="#2b5797">
+        <meta name="msapplication-TileImage" content="/mstile-144x144.png">
+        <meta name="theme-color" content="#ffffff">
+
         <!-- Bootstrap CSS -->
         <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="style/style.css" />
@@ -22,7 +41,7 @@
     <body>
         <div class="page-header">
             <div class="container">
-                <h1>CSVDump <small>Dump CSV files into a MySQL Database <em>fast</em></small></h1>
+                <h1><img src="style/icon-64.png" alt="CSVDump" />CSVDump <small>Dump CSV files into a MySQL Database <em>fast</em></small></h1>
             </div>
         </div>
         <div class="progress hidden" id="script-progress-mini">
@@ -93,6 +112,18 @@ else: // if(!file_exists('./CSVRunner/Config.php')):
                     <button class="btn btn-primary btn-small" type="button" data-toggle="collapse" data-target="#advancedOptions" aria-expanded="false" aria-controls="advancedOptions">
                     Advanced Options <span class="glyphicon glyphicon glyphicon-cog"></span>
                     </button>
+                    <div class="checkbox">
+                        <label for="inputReplace">
+                            <input type="checkbox" value="" name="inputReplace" id="inputReplace" title="Whether to replace existing data">
+                            Replace Data
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <label for="inputHh">
+                            <input type="checkbox" checked value="" name="inputHh" id="inputHh" title="Whether your csv has headers">
+                            Has Headers
+                        </label>
+                    </div>
                     <div class="collapse" id="advancedOptions">
                         <div class="well">
                             <label for="inputChunks">Chunk Size
@@ -116,18 +147,6 @@ else: // if(!file_exists('./CSVRunner/Config.php')):
                                     <?php foreach (CSVRunner::$escapeChars as $p) printf("<option value=\"%s\">%s</option>\n", $p, str_replace("\t","\\t",$p)); ?>
                                 </select>
                             </label>
-                            <div class="checkbox">
-                                <label for="inputReplace">
-                                    <input type="checkbox" value="" name="hh" id="inputReplace" title="Whether to replace existing data">
-                                    Replace Data
-                                </label>
-                            </div>
-                            <div class="checkbox">
-                                <label>
-                                    <input type="checkbox" checked value="" name="hh" id="inputHh" title="Whether your csv has headers">
-                                    Has Headers
-                                </label>
-                            </div>
                         </div>
                     </div>
                 </div>
