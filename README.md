@@ -12,13 +12,13 @@ CSVDump has the following features:
 
 ## Installation
 
-Simply clone the repo into a local directory accessible on your web server:
+Simply clone the repo into a local directory accessible on your web server. Note, you need to use the ```--recursive``` option because this repo has submodules:
 
-    git clone https://github.com/manticorp/CSVDump.git ./public_html/CSVDump
+    git clone https://github.com/manticorp/CSVDump.git ./public_html/CSVDump --recursive
 
 or just:
 
-    git clone https://github.com/manticorp/CSVDump.git
+    git clone https://github.com/manticorp/CSVDump.git --recursive
 
 then point your browser to:
 

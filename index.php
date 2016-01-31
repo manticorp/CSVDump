@@ -184,7 +184,7 @@ else: // if(!file_exists('./CSVRunner/Config.php')):
                                     <td><?php echo CSVRunner::numRowsInFile($fn);?></td>
                                     <td class="dump-file"><a href='#script-progress' class='process-file' data data-jp='false' data-local-fn='input/<?php echo basename($fn); ?>' data-fn='<?php echo urlencode(realpath($fn));?>'><i class="glyphicon glyphicon-import"></i> Dump to <span class="databaseName"><?php echo $db['db'] . '</span>.<span class="tableName">' . $idBase;?></span></a></td>
                                     <td class="delete-file" data-toggle="tooltip" data-placement="top" title="Warning: This will delete the file permanently, it will not be recoverable">
-                                        <a href='http://<?=$baseurl;?>?delete=true&fn=<?php echo urlencode(realpath($fn));?>'>Delete File <i class="glyphicon glyphicon-trash"></i> <i class="glyphicon glyphicon-warning-sign"></i></a>
+                                        <a href='http://<?php echo $baseurl; ?>?delete=true&fn=<?php echo urlencode(realpath($fn));?>'>Delete File <i class="glyphicon glyphicon-trash"></i> <i class="glyphicon glyphicon-warning-sign"></i></a>
                                     </td>
                                 </tr>
                                 <tr class="secondary-row">
@@ -215,7 +215,7 @@ else: // if(!file_exists('./CSVRunner/Config.php')):
                                                         </td>
                                                         <td>This feature has not been implemented yet.</td>
                                                     </tr>
-                                                <? endforeach; ?>
+                                                <?php endforeach; ?>
                                                 </tbody>
                                             </table>
                                         </div>
