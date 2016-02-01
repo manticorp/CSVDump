@@ -138,10 +138,15 @@ class CSVRunner {
         }
 
         // Now we can change the columns according to the coltypes defined
+        $processorName = 'Processor_DB_Core';
         $processor = $this->getProcessor(
-            'Processor_DB_Core',
+            $processorName,
             $this->vars['db']
         );
+        if($processor === false) {
+            $fn = APPLICATION_PATH . DIRECTORY_SEPARATOR . 'CSVRunner' . DIRECTORY_SEPARATOR . str_replace('_',DIRECTORY_SEPARATOR,$processorName).'.php';
+            trigger_error('Processor: ' . $processorName . ' not found, please make sure it exists under ' . $fn);
+        }
         $processor->changeColTypes($this->vars['columnTypes']);
 
         // Update the progressupdater accordingly
@@ -717,7 +722,7 @@ EOF;
         if($className == false){
             return false;
         }
-        $fn = __DIR__ . DIRECTORY_SEPARATOR . str_replace('_',DIRECTORY_SEPARATOR,$className).'.php';
+        $fn = APPLICATION_PATH . DIRECTORY_SEPARATOR . 'CSVRunner' . DIRECTORY_SEPARATOR . str_replace('_',DIRECTORY_SEPARATOR,$className).'.php';
         if(!file_exists($fn)){
             return false;
         }
