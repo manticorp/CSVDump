@@ -1,3 +1,3 @@
 [submodule "CSVRunner/ajaxProcessUpdater"]
-    path = CSVRunner/ajaxProcessUpdater
-    url = https://github.com/manticorp/ajaxProcessUpdater.git
+	path = CSVRunner/ajaxProcessUpdater
+	url = https://github.com/manticorp/ajaxProcessUpdater.git
