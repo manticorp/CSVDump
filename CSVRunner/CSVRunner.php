@@ -607,6 +607,9 @@ EOF;
         $this->vars['method'] = ($this->vars['hh']) ? 1 : 2;
 
         // This is the output filename, used as a temporary file for dumping to DB
+        if(!is_dir(APPLICATION_PATH . DIRECTORY_SEPARATOR . 'var')){
+            mkdir(APPLICATION_PATH . DIRECTORY_SEPARATOR . 'var');
+        }
         $this->vars['ofn'] = APPLICATION_PATH . '/var/output-' . (int) (rand() * 1000) . '.csv';
 
         // Gets the table name
