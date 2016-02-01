@@ -375,7 +375,7 @@ EOF;
             $headers = $file->fgetcsv($this->vars['delimiter'], $this->vars['quotechar'], $this->vars['escapechar']);
 
             // number of columns to get for guessing types
-            $n = 10;
+            $n = min(10, $this->numLines());
             $firstNCols = array();
             for($i = 0; $i < $n; $i++){
                 $firstNCols[$i] = $file->fgetcsv($this->vars['delimiter'], $this->vars['quotechar'], $this->vars['escapechar']);
@@ -390,8 +390,20 @@ EOF;
             // guess the column types from the first n rows of info
             $colTypes = array_fill(0,count($cols),null);
             for($i = 0; $i < $n; $i++){
-                foreach ($cols as $j => &$col) {
-                    $colTypes[$j] = $this->guessType($firstNCols[$i][$j], $colTypes[$j]);
+                foreach ($cols as $j => $col) {
+                    if(!isset($firstNCols[$i])){
+                        trigger_error('Why don\'t we have row ' . $i . '??');
+                    }
+                    if(!isset($firstNCols[$i][$j])){
+                        if(count($firstNCols[$i]) !== count($cols)){
+                            trigger_error('Column count is inconsistent throughout the file. If you\'re sure you have the right amount of columns, please check the delimiter options.');
+                        }
+                        trigger_error('Why don\'t we have column ' . $j . '??');
+                    }
+                    $colTypes[$j] = $this->guessType(
+                        $firstNCols[$i][$j],
+                        $colTypes[$j]
+                    );
                 }
             }
 
