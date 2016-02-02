@@ -736,6 +736,9 @@ EOF;
         return $r;
     }
 
+    /**
+     * Gets the available processors
+     */
     public static function getProcessors()
     {
         $folders = array(

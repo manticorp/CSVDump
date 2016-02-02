@@ -182,7 +182,7 @@ else: // if(!file_exists('./CSVRunner/Config.php')):
                                     <td><?php echo basename($fn);?></td>
                                     <td><?php echo CSVRunner::fileSizeString($fn, 1);?></td>
                                     <td><?php echo CSVRunner::numRowsInFile($fn);?></td>
-                                    <td class="dump-file"><a href='#script-progress' class='process-file' data data-jp='false' data-local-fn='input/<?php echo basename($fn); ?>' data-fn='<?php echo urlencode(realpath($fn));?>'><i class="glyphicon glyphicon-import"></i> Dump to <span class="databaseName"><?php echo $db['db'] . '</span>.<span class="tableName">' . $idBase;?></span></a></td>
+                                    <td class="dump-file"><a href='#script-progress' class='process-file' data-jp='false' data-local-fn='input/<?php echo basename($fn); ?>' data-fn='<?php echo urlencode(realpath($fn));?>'><i class="glyphicon glyphicon-import"></i> Dump to <span class="databaseName"><?php echo $db['db'] . '</span>.<span class="tableName">' . $idBase;?></span></a></td>
                                     <td class="delete-file" data-toggle="tooltip" data-placement="top" title="Warning: This will delete the file permanently, it will not be recoverable">
                                         <a href='http://<?php echo $baseurl; ?>?delete=true&fn=<?php echo urlencode(realpath($fn));?>'>Delete File <i class="glyphicon glyphicon-trash"></i> <i class="glyphicon glyphicon-warning-sign"></i></a>
                                     </td>
