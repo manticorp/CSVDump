@@ -118,7 +118,7 @@ class CSVRunner {
         $this->getMysqli();
 
         // Number of lines in the input file
-        $numLines = ($method = 1) ? $this->numLines() : CSVRunner::numRowsInFile($this->vars['ifn']);
+        $numLines = $this->numLines();
 
         $rowProcessor = $this->getProcessor($this->vars['rowProcessor']);
         $dbProcessor  = $this->getProcessor(
@@ -653,8 +653,16 @@ EOF;
      */
     public function numLines()
     {
-        if($this->state['numlines']) return $this->state['numlines'];
-        else return self::numRowsInFile($this->vars['ifn']);
+        if($this->state['numlines']) {
+            return $this->state['numlines'];
+        } else {
+            $numRows = self::numRowsInFile($this->vars['ifn']);
+            if($numRows < 100){
+                $numRows = self::numRowsInFileAccurate($this->vars['ifn'],$this->vars['delimiter'], $this->vars['quotechar'], $this->vars['escapechar']);
+            }
+            $this->state['numlines'] = $numRows;
+            return $this->state['numlines'];
+        }
     }
 
     /**
@@ -677,6 +685,18 @@ EOF;
         }
 
         fclose($fp);
+        return $numLines;
+    }
+
+    /**
+     * Gets an estimate for the number of rows in a file.
+     * @param  string $fn Filename
+     * @return int        The number of lines in the file.
+     */
+    public static function numRowsInFileAccurate($fn, $delim=',', $quoteChar='"', $escapeChar='\\')
+    {
+        $csv = self::csvFileToArray($fn,  $delim, $quoteChar, $escapeChar);
+        $numLines = count($csv);
         return $numLines;
     }
 
