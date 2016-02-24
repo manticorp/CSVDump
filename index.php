@@ -41,11 +41,20 @@
     <body>
         <div class="page-header">
             <div class="container">
-                <h1><img src="style/icon-64.png" alt="CSVDump" />CSVDump <small>Dump CSV files into a MySQL Database <em>fast</em></small></h1>
+                <h1>
+	                <img src="style/icon-64.png" alt="CSVDump" />CSVDump 
+	                <small>Dump CSV files into a MySQL Database <em>fast</em></small>
+                </h1>
             </div>
         </div>
         <div class="progress hidden" id="script-progress-mini">
-            <div class="progress-bar progress-bar-striped active" id="progress-bar-start-mini" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0">
+            <div class="progress-bar progress-bar-striped active" 
+            id="progress-bar-start-mini" 
+            role="progressbar" 
+            aria-valuenow="0" 
+            aria-valuemin="0" 
+            aria-valuemax="100" 
+            style="width: 0">
                 <span class="sr-only">0% Complete</span>
             </div>
         </div>
@@ -66,9 +75,11 @@ if(!file_exists('./CSVRunner/Config.php')):
                     <div class="warning" id="config_file_not_exists">
                         <p>You are missing the /CSVRunner/Config.php file.</p>
                     <?php if(file_exists('./CSVRunner/Config.example.php')): ?>
-                        <p>Edit <code>/CSVRunner/Config.example.php</code> with your database details and save as <code>/CSVRunner/Config.php</code>.</p>
+                        <p>Edit <code>/CSVRunner/Config.example.php</code> with your database details and save as 
+                        <code>/CSVRunner/Config.php</code>.</p>
                     <?php else: ?>
-                        <p>Also missing <code>/CSVRunner/Config.example.php</code>, please <a href='https://github.com/manticorp/CSVDump'>re-download the repository.</a></p>";
+                        <p>Also missing <code>/CSVRunner/Config.example.php</code>, please 
+                        <a href='https://github.com/manticorp/CSVDump'>re-download the repository.</a></p>";
                     <?php endif; ?>
                     </div>
                 </div>
@@ -98,18 +109,38 @@ else: // if(!file_exists('./CSVRunner/Config.php')):
                 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                     <h2>Input</h2>
                     <label for="inputDb">Database
-                        <input type="text" name="db"    id="inputDb"    class="form-control" value=""    title="" placeholder="e.g. test">
+                        <input type="text" name="db"    
+                        id="inputDb"    
+                        class="form-control" 
+                        value=""    
+                        title="" 
+                        placeholder="e.g. test">
                     </label>
                     <label for="inputTable">Table
-                        <input type="text" name="table" id="inputTable" class="form-control" value="" title="" placeholder="e.g. testTable">
+                        <input type="text" 
+                        name="table" 
+                        id="inputTable" 
+                        class="form-control" 
+                        value="" 
+                        title="" 
+                        placeholder="e.g. testTable">
                     </label>
                     <label for="processor">Processor Class
-                        <select name="processor" id="processor" class="form-control" required="required">
+                        <select name="processor" id="processor" 
+                        class="form-control" required="required">
                             <option value="">No Processing</option>
-                            <?php foreach ($processors as $p) printf("<option value=\"%s\">%s</option>\n", $p, $p); ?>
+                            <?php 
+                            foreach ($processors as $p) {
+                                printf("<option value=\"%s\">%s</option>\n", $p, $p);
+                            } ?>
                         </select>
                     </label>
-                    <button class="btn btn-primary btn-small" type="button" data-toggle="collapse" data-target="#advancedOptions" aria-expanded="false" aria-controls="advancedOptions">
+                    <button class="btn btn-primary btn-small"
+                    type="button"
+                    data-toggle="collapse"
+                    data-target="#advancedOptions" 
+                    aria-expanded="false"
+                    aria-controls="advancedOptions">
                     Advanced Options <span class="glyphicon glyphicon glyphicon-cog"></span>
                     </button>
                     <div class="checkbox">

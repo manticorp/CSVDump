@@ -1,7 +1,7 @@
 <?php
 
 // Include our config file
-include_once(__DIR__ . "/Config.php");
+include_once __DIR__ . "/Config.php";
 
 /**
  * CsvRunner
@@ -764,7 +764,7 @@ EOF;
         if(!file_exists($fn)){
             return false;
         }
-        include($fn);
+        include $fn;
         $processor = new $className($params);
         return $processor;
     }

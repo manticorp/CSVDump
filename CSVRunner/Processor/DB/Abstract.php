@@ -123,7 +123,7 @@ abstract class Processor_DB_Abstract
     {
         $sql = "SHOW FIELDS FROM `".$this->getTableName()."`;";
         $r = $this->query($sql);
-        while($row = $r->fetch_array(MYSQLI_ASSOC)){
+        while ($row = $r->fetch_array(MYSQLI_ASSOC)) {
             if($row['Field'] == $col) return $row;
         }
         trigger_error('Column ' . $col . ' doesn\'t exist');
@@ -132,11 +132,11 @@ abstract class Processor_DB_Abstract
 
     public function getConnection()
     {
-        $mysql_server   = $this->params['host'];
-        $mysql_user     = $this->params['user'];
-        $mysql_password = $this->params['password'];
-        $mysql_db       = $this->params['db'];
-        $this->mysqli   = new mysqli($mysql_server, $mysql_user, $mysql_password, $mysql_db);
+        $mysqlServer   = $this->params['host'];
+        $mysqlUser     = $this->params['user'];
+        $mysqlPassword = $this->params['password'];
+        $mysqlDb       = $this->params['db'];
+        $this->mysqli   = new mysqli($mysqlServer, $mysqlUser, $mysqlPassword, $mysqlDb);
         if ($this->mysqli->connect_errno) {
             printf("Connection failed: %s \n", $this->mysqli->connect_error);
             exit();
@@ -145,9 +145,9 @@ abstract class Processor_DB_Abstract
         return $this->mysqli;
     }
 
-    public function query($SQL, $suppressErrors = false)
+    public function query($sql, $suppressErrors = false)
     {
-        if (!$r = $this->mysqli->query($SQL)) {
+        if (!$r = $this->mysqli->query($sql)) {
             if (!$suppressErrors) {
                 user_error($this->mysqli->error);
             }
@@ -155,14 +155,16 @@ abstract class Processor_DB_Abstract
         return $r;
     }
 
-    public function dropColumn($name){
-        $SQL = "ALTER TABLE `" . $this->getTableName() . "` DROP `" . $name . "`;";
-        $this->query($SQL);
+    public function dropColumn($name)
+    {
+        $sql = "ALTER TABLE `" . $this->getTableName() . "` DROP `" . $name . "`;";
+        $this->query($sql);
         return $this;
     }
 
-    public function modifyColumn($name, $type, $size = null, $options = array(), $comment = null, $newname = null){
-        if(!$this->tableColumnExists($name)){
+    public function modifyColumn($name, $type, $size = null, $options = array(), $comment = null, $newname = null)
+    {
+        if (!$this->tableColumnExists($name)) {
             trigger_error('Column: \'' . $name .'\' doesn\'t exist!');
             exit(1);
         }
@@ -336,53 +338,53 @@ abstract class Processor_DB_Abstract
             'COMMENT'           => $comment
         );
 
-        $SQL  = "ALTER TABLE `".$this->getTableName()."` ";
+        $sql  = "ALTER TABLE `".$this->getTableName()."` ";
 
         // Here we modify the column if it already exists,
         // because on repeat runs we don't want it to throw
         // an error!
-        if(!$this->tableColumnExists($column['COLUMN_NAME'])){
-            $SQL .= "ADD";
+        if (!$this->tableColumnExists($column['COLUMN_NAME'])) {
+            $sql .= "ADD";
         } else {
-            $SQL .= "CHANGE";
+            $sql .= "CHANGE";
         }
 
-        $SQL .= " `".$column['COLUMN_NAME']."` ";
-        if($this->tableColumnExists($column['COLUMN_NAME'])){
-            $SQL .= "`" . $newname . "` ";
+        $sql .= " `".$column['COLUMN_NAME']."` ";
+        if ($this->tableColumnExists($column['COLUMN_NAME'])) {
+            $sql .= "`" . $newname . "` ";
         }
-        $SQL .= $column['COLUMN_TYPE'];
-        if(
+        $sql .= $column['COLUMN_TYPE'];
+        if (
             $column['COLUMN_TYPE'] == self::TYPE_DECIMAL ||
             $column['COLUMN_TYPE'] == self::TYPE_NUMERIC
-        ){
-            $SQL .= " (".$column['SCALE'].", " . $column['PRECISION'] . ")";
-        } else if($column['LENGTH']){
-            $SQL .= " (" . $column['LENGTH'] . ")";
+        ) {
+            $sql .= " (".$column['SCALE'].", " . $column['PRECISION'] . ")";
+        } else if ($column['LENGTH']) {
+            $sql .= " (" . $column['LENGTH'] . ")";
         }
-        if($column['UNSIGNED']){
-            $SQL .= " UNSIGNED";
+        if ($column['UNSIGNED']) {
+            $sql .= " UNSIGNED";
         }
-        if($column['NULLABLE']){
-            $SQL .= " NULL";
+        if ($column['NULLABLE']) {
+            $sql .= " NULL";
         } else {
-            $SQL .= " NOT NULL";
+            $sql .= " NOT NULL";
         }
-        if($column['DEFAULT']){
-            $SQL .= " DEFAULT ";
-            if(
+        if ($column['DEFAULT']) {
+            $sql .= " DEFAULT ";
+            if (
                 $column['COLUMN_TYPE'] == self::TYPE_TEXT ||
                 $column['COLUMN_TYPE'] == self::TYPE_BLOB
-            ){
-                $SQL .= "\"" . $this->mysqli->real_escape_string($column['DEFAULT']) . "\"";
+            ) {
+                $sql .= "\"" . $this->mysqli->real_escape_string($column['DEFAULT']) . "\"";
             } else {
-                $SQL .= $column['DEFAULT'];
+                $sql .= $column['DEFAULT'];
             }
-        } else if ($column['NULLABLE']){
-            $SQL .= " DEFAULT NULL";
+        } else if ($column['NULLABLE']) {
+            $sql .= " DEFAULT NULL";
         }
-        $SQL .= " COMMENT '" . $column['COMMENT'] . "';";
-        $this->query($SQL);
+        $sql .= " COMMENT '" . $column['COMMENT'] . "';";
+        $this->query($sql);
 
         return $this;
     }

@@ -1,13 +1,13 @@
 <?php
 
-include_once(__DIR__ . "/Config.php");
-include_once(__DIR__ . "/CSVRunner.php");
+include_once __DIR__ . "/Config.php";
+include_once __DIR__ . "/CSVRunner.php";
 
 $fileList = glob(APPLICATION_PATH.'/input/*.csv');
 
 $output = array();
 
-foreach($fileList as $fn){
+foreach ($fileList as $fn) {
     $file = array();
     $file['fn']       = $fn;
     $file['data-fn']  = urlencode(realpath($fn));
