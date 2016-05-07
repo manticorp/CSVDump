@@ -2,7 +2,7 @@ window.progressInterval;
 window.prevpc;
 window.hasError = false;
 window.finished = false;
-window.pollingPeriod = 1000;
+window.pollingPeriod = 100;
 window.updatePeriod = 250;
 window.fileCheckUpdatePeriod = 5000;
 window.lastData = null;
@@ -408,7 +408,7 @@ function checkProgress(createStatusBars) {
 
         $.getJSON(url, function(data) {
 
-            console.log(data);
+            console.log('---Data---',data);
 
             var d = new Date();
             window.lastUpdate = d.getTime();
@@ -423,7 +423,11 @@ function checkProgress(createStatusBars) {
         var data = $.extend({}, window.lastData);
         data.stage.completeItems = Math.max(1, Math.min((data.stage.completeItems + Math.floor(((new Date().getTime() / 1000) - data.stage.curTime) * (data.stage.rate * (window.updatePeriod / 1000)))), data.stage.totalItems));
         data.stage.pcComplete = Math.max(0.01, Math.min(((data.stage.completeItems) / data.stage.totalItems), 1));
-        data.stage.timeRemaining = (data.stage.totalItems - data.stage.completeItems) / data.stage.rate;
+        if(data.stage.rate) {
+            data.stage.timeRemaining = (data.stage.totalItems - data.stage.completeItems) / data.stage.rate;
+        } else {
+            data.stage.timeRemaining = 'Unknown';
+        }
         updateDisplay(data);
     }
 }
@@ -450,7 +454,11 @@ function updateDisplay(data) {
     if (window.prevpc === data.stage.pcComplete & data.stage.rate !== null) {
         data.stage.completeItems = Math.max(1, Math.min((data.stage.completeItems + Math.floor(((new Date().getTime() / 1000) - data.stage.curTime) * data.stage.rate * (window.updaePeriod / 1000))), data.stage.totalItems));
         data.stage.pcComplete = Math.max(0.01, Math.min(((data.stage.completeItems) / data.stage.totalItems), 1));
-        data.stage.timeRemaining = (data.stage.totalItems - data.stage.completeItems) / data.stage.rate;
+        if(data.stage.rate) {
+            data.stage.timeRemaining = (data.stage.totalItems - data.stage.completeItems) / data.stage.rate;
+        } else {
+            data.stage.timeRemaining = 'Unknown';
+        }
     } else {
         window.prevpc = data.stage.pcComplete;
     }
@@ -463,10 +471,17 @@ function updateDisplay(data) {
         $output.append($('<p>Server message: <pre><code>' + data.stage.message + '</code></pre></p>'));
     if (data.stage.totalItems !== null)
         $output.append($('<p>' + data.stage.completeItems + ' of ' + data.stage.totalItems + ' processed.</p>'));
-    if (data.stage.timeRemaining !== null)
-        $output.append($('<p>Remaining time: ' + Math.ceil(data.stage.timeRemaining * 10) / 10 + ' seconds (est)</p>'));
-    if (data.stage.rate !== null)
+    if (data.stage.timeRemaining !== null) {
+        if(data.stage.timeRemaning !== 'Unknown') {
+            data.stage.timeRemaining = Math.ceil(data.stage.timeRemaining * 10) / 10 + ' seconds (est)';
+        }
+        $output.append($('<p>Remaining time: ' + data.stage.timeRemaining + '</p>'));
+    }
+    if (data.stage.rate !== null) {
         $output.append($('<p>Currently processing at ' + Math.ceil(data.stage.rate * 10) / 10 + ' /second</p>'));
+    } else {
+        $output.append($('<p>Currently processing at an unknown rate</p>'));
+    }
 
     for (i = (data.stage.stageNum - 1); i > 0; i--) {
         $('#tertiary-status-' + (i))
