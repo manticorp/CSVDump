@@ -319,6 +319,12 @@ EOF;
      */
     private function loadAndEmptyCSV($columns = null)
     {
+        if(is_null($this->state['ofh'])) {
+            do {
+                usleep(500);
+                $this->state['ofh'] = @fopen($this->vars['ofn'], 'w+');
+            } while ($this->state['ofh']  === false || $this->state['ofh'] === null);
+        }
         fclose($this->state['ofh']);
         $SQL = "LOAD DATA LOCAL INFILE '" . str_replace('\\', '\\\\', realpath($this->vars['ofn'])) . "'
     INTO TABLE `{$this->vars['db']['table']}`
