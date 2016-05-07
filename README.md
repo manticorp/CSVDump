@@ -24,7 +24,7 @@ then point your browser to:
 
 [http://localhost/CSVDump](http://localhost/CSVDump)
 
-![Usage Gif](http://i.imgur.com/8jOk9M2.gifv)
+![Usage Gif](http://i.imgur.com/8jOk9M2.gif)
 
 ## Usage
 
