@@ -35,6 +35,8 @@ class CSVRunner {
             'table'     => '',              // DB Table to dump to
         ),
         'columnTypes'   => array(),
+        'characterSet'  => 'utf8',
+        'collation'     => 'utf8_general_ci'
     );
 
     public static $colTypes = array(
@@ -243,9 +245,9 @@ EOF;
                         $this->pu->setStageMessage("Processing Item $i / $numLines");
                         $this->pu->incrementStageItems($this->vars['chunks'], true);
                     }
-                    $row = $file->fgetcsv($this->vars['delimiter'], $this->vars['quotechar'], $this->vars['escapechar']);
+                    $rows = $file->fgetcsv($this->vars['delimiter'], $this->vars['quotechar'], $this->vars['escapechar']);
                     if($rowProcessor !== false){
-                        $row = $rowProcessor->process($row);
+                        $rows = $rowProcessor->process($rows);
                     }
                     if(!is_array($rows[array_keys($rows)[0]])){
                         $rows = array($rows);
@@ -372,7 +374,7 @@ EOF;
             for ($i = 0; $i < $c; $i++) {
                 $col = "    `Column_" . $i . "` ";
                 $col .= is_numeric($oc[$i]) ? "DECIMAL(12,6) DEFAULT NULL" :
-                                                       "VARCHAR(512) DEFAULT NULL";
+                                                       "VARCHAR(512) CHARACTER SET " . $this->vars['characterSet'] . " COLLATE " . $this->vars['collation'] . " DEFAULT NULL";
                 $cols[] = $col;
             }
         } else {
@@ -414,7 +416,7 @@ EOF;
             }
 
             foreach($colTypes as $i => &$type){
-                $type = (is_null($type)) ? 'VARCHAR(512)' : $type;
+                $type = (is_null($type)) ? 'VARCHAR(512) CHARACTER SET ' . $this->vars['characterSet'] . ' COLLATE ' . $this->vars['collation'] . '' : $type;
             }
 
             /*echo "<pre>";
@@ -434,7 +436,7 @@ EOF;
         array_unshift($cols, '    `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT \'id\'');
         $SQL = "CREATE TABLE IF NOT EXISTS `{$this->vars['db']['db']}`.`{$this->vars['db']['table']}` (\n";
         $SQL .= implode(",\n", $cols);
-        $SQL .= "\n) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+        $SQL .= "\n) ENGINE=InnoDB DEFAULT CHARSET=".$this->vars['characterSet']." CHARSET=".$this->vars['characterSet']." COLLATE ".$this->vars['collation'].";";
         $this->executeSql($SQL);
 
         return $this;
@@ -467,7 +469,7 @@ EOF;
         if(is_numeric($val) && $prevTypeSimple !== 'VARCHAR'){
             // Check we don't have a leading zero string (e.g. barcodes)
             if((string)$val[0] === '0' && (string)$val[1] !== '.'){
-                $type = 'VARCHAR(512) DEFAULT NULL';
+                $type = 'VARCHAR(512) CHARACTER SET ' . $this->vars['characterSet'] . ' COLLATE ' . $this->vars['collation'] . ' DEFAULT NULL';
             } else if (strpos($val,".") !== false) { // Check for decimals
                 $prevPrecision = (is_null($prevType)) ? array(12,6) : $this->getDecimalPrecisions($prevType);
                 // print_r($prevPrecision);echo "\n";
@@ -480,9 +482,9 @@ EOF;
             }
         } else if($prevTypeSimple === 'VARCHAR'){
             $precision = max(strlen($val)+256,$this->getVarcharPrecision($prevType));
-            $type = 'VARCHAR('.$precision.') DEFAULT NULL'; // Always default to a semi-long varchar - that's a pretty safe bet.
+            $type = 'VARCHAR('.$precision.') CHARACTER SET ' . $this->vars['characterSet'] . ' COLLATE ' . $this->vars['collation'] . ' DEFAULT NULL'; // Always default to a semi-long varchar - that's a pretty safe bet.
         } else {
-            $type = 'VARCHAR('.(strlen($val)+256).') DEFAULT NULL'; // Always default to a semi-long varchar - that's a pretty safe bet.
+            $type = 'VARCHAR('.(strlen($val)+256).') CHARACTER SET ' . $this->vars['characterSet'] . ' COLLATE ' . $this->vars['collation'] . ' DEFAULT NULL'; // Always default to a semi-long varchar - that's a pretty safe bet.
         }
         return $type;
     }
@@ -635,6 +637,9 @@ EOF;
 
         // Gets the column types as defined by the user
         $this->vars['columnTypes'] = json_decode($_GET['columnTypes']);
+
+        $this->vars['characterSet'] = isset($_GET['characterSet']) ? $_GET['characterSet'] : $this->vars['characterSet'];
+        $this->vars['collation']    = isset($_GET['collation']) ? $_GET['collation'] : $this->vars['collation'];
 
         return $this;
     }
