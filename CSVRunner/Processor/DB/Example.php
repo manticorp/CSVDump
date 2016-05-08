@@ -29,6 +29,10 @@ class Processor_DB_Example extends Processor_DB_Abstract
             // do nothing, this is okay because on multiple imports it might fail on
             // the second import when the column already exists.
         }
+
+        // Change a column to a UTF8 column
+        $this->modifyColumn('utf8column', Processor_DB_Abstract::TYPE_VARCHAR, 255, ['collate' => 'utf8_general_ci'], 'My UTF8 column');
+
         return $this;
     }
 

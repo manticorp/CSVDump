@@ -184,6 +184,8 @@ abstract class Processor_DB_Abstract
      * - 'primary', add column to primary index. Default: do not add.
      * - 'primary_position', only for column in primary index. Default: count of primary columns + 1.
      * - 'identity' or 'auto_increment'. Default: FALSE.
+     * - 'charset' e.g. utf8
+     * - 'collate' e.g. utf8_general_ci
      *
      * @param string $name the column name
      * @param string $type the column data type
@@ -204,11 +206,13 @@ abstract class Processor_DB_Abstract
         $primary            = false;
         $primaryPosition    = 0;
         $identity           = false;
+        $charset            = null;
+        $collate            = null;
 
         // Convert deprecated types
         switch ($type) {
             case self::TYPE_CHAR:
-            case self::TYPE_VARCHAR:
+            // case self::TYPE_VARCHAR:
             case self::TYPE_LONGVARCHAR:
             case self::TYPE_CLOB:
                 $type = self::TYPE_TEXT;
@@ -282,10 +286,16 @@ abstract class Processor_DB_Abstract
             case self::TYPE_DATETIME:
             case self::TYPE_TIMESTAMP:
                 break;
+            case self::TYPE_VARCHAR:
             case self::TYPE_TEXT:
             case self::TYPE_BLOB:
             case self::TYPE_VARBINARY:
+            case self::TYPE_CHAR:
+            case self::TYPE_LONGVARCHAR:
+            case self::TYPE_CLOB:
                 $length = $size;
+                $charset = isset($options['charset']) ? $options['charset'] : null;
+                $collate = isset($options['collate']) ? $options['collate'] : null;
                 break;
             default:
                 trigger_error('Invalid column data type "' . $type . '"');
@@ -335,8 +345,15 @@ abstract class Processor_DB_Abstract
             'PRIMARY'           => $primary,
             'PRIMARY_POSITION'  => $primaryPosition,
             'IDENTITY'          => $identity,
-            'COMMENT'           => $comment
+            'COMMENT'           => $comment,
+            'CHARACTER_SET'     => $charset,
+            'COLLATE'           => $collate
         );
+
+        if($column['COLLATE'] && !!$column['CHARACTER_SET']) {
+            $temp = explode("_",$column['COLLATE']);
+            $column['CHARACTER_SET']  = $temp[0];
+        }
 
         $sql  = "ALTER TABLE `".$this->getTableName()."` ";
 
@@ -361,6 +378,12 @@ abstract class Processor_DB_Abstract
             $sql .= " (".$column['SCALE'].", " . $column['PRECISION'] . ")";
         } else if ($column['LENGTH']) {
             $sql .= " (" . $column['LENGTH'] . ")";
+        }
+        if ($column['CHARACTER_SET']) {
+            $sql .= ' CHARACTER SET ' . $column['CHARACTER_SET'];
+        }
+        if ($column['COLLATE']) {
+            $sql .= ' COLLATE ' . $column['COLLATE'];
         }
         if ($column['UNSIGNED']) {
             $sql .= " UNSIGNED";
