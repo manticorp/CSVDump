@@ -158,7 +158,7 @@ abstract class Processor_DB_Abstract
     public function changeColumnCharset($column, $newCharSet)
     {
         $def = $this->getColumnDefinition($column);
-        $SQL = 'ALTER TABLE `' . $this->getTableName() .'` MODIFY `' . $column . '` ' . strtoupper($def['type']) . ' CHARACTER SET ' . $newCharSet .';';
+        $sql = 'ALTER TABLE `' . $this->getTableName() .'` MODIFY `' . $column . '` ' . strtoupper($def['Type']) . ' CHARACTER SET ' . $newCharSet .';';
         $this->query($sql);
         return $this;
     }
@@ -169,7 +169,7 @@ abstract class Processor_DB_Abstract
         if(is_null($newCharSet)) {
             $newCharSet = explode("_",$newCollation)[0];
         }
-        $SQL = 'ALTER TABLE `' . $this->getTableName() .'` MODIFY `' . $column . '` ' . strtoupper($def['type']) . ' COLLATE ' . $newCharSet . ' CHARACTER SET ' . $newCharSet .';';
+        $sql = 'ALTER TABLE `' . $this->getTableName() .'` MODIFY `' . $column . '` ' . strtoupper($def['Type']) . ' CHARACTER SET ' . $newCharSet . ' COLLATE ' . $newCollation .';';
         $this->query($sql);
         return $this;
     }
