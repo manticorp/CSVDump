@@ -130,6 +130,17 @@ abstract class Processor_DB_Abstract
         exit(1);
     }
 
+    public function getColumns()
+    {
+        $sql = "SHOW FIELDS FROM `".$this->getTableName()."`;";
+        $r = $this->query($sql);
+        $columns = array();
+        while ($row = $r->fetch_array(MYSQLI_ASSOC)) {
+            $columns[$row['Field']] = $row;
+        }
+        return $columns;
+    }
+
     public function getConnection()
     {
         $mysqlServer   = $this->params['host'];
@@ -158,6 +169,9 @@ abstract class Processor_DB_Abstract
     public function changeColumnCharset($column, $newCharSet)
     {
         $def = $this->getColumnDefinition($column);
+        if(!$this->canAcceptEncoding($this->getBareTypeFromMySqlType($def['Type']))) {
+            return $this;
+        }
         $sql = 'ALTER TABLE `' . $this->getTableName() .'` MODIFY `' . $column . '` ' . strtoupper($def['Type']) . ' CHARACTER SET ' . $newCharSet .';';
         $this->query($sql);
         return $this;
@@ -166,12 +180,32 @@ abstract class Processor_DB_Abstract
     public function changeColumnCollation($column, $newCollation, $newCharSet = null)
     {
         $def = $this->getColumnDefinition($column);
+        if(!$this->canAcceptEncoding($this->getBareTypeFromMySqlType($def['Type']))) {
+            return $this;
+        }
         if(is_null($newCharSet)) {
             $newCharSet = explode("_",$newCollation)[0];
         }
         $sql = 'ALTER TABLE `' . $this->getTableName() .'` MODIFY `' . $column . '` ' . strtoupper($def['Type']) . ' CHARACTER SET ' . $newCharSet . ' COLLATE ' . $newCollation .';';
         $this->query($sql);
         return $this;
+    }
+
+    public function canAcceptEncoding($colType)
+    {
+        $can = array(
+            self::TYPE_TEXT,
+            self::TYPE_CHAR,
+            self::TYPE_VARCHAR,
+            self::TYPE_LONGVARCHAR,
+            self::TYPE_CLOB,
+        );
+        return in_array(strtolower($colType), $can);
+    }
+
+    public function getBareTypeFromMySqlType($mysqlType)
+    {
+        return strtolower(explode("(",$mysqlType)[0]);
     }
 
     public function dropColumn($name)

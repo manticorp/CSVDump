@@ -34,6 +34,11 @@ class Processor_DB_Example extends Processor_DB_Abstract
         $this->modifyColumn('utf8column', Processor_DB_Abstract::TYPE_VARCHAR, 255, ['collate' => 'utf8_general_ci'], 'My UTF8 column');
         // or
         $this->changeColumnCollation('utf8column', 'utf8_general_ci', 'utf8');
+        // or
+        $columns = $this->getColumns();
+        foreach($columns as $columnName => $columnDefinition) {
+            $this->changeColumnCollation($columnName, 'utf8_general_ci');
+        }
 
         return $this;
     }
