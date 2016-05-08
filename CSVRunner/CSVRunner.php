@@ -168,7 +168,10 @@ EOF;
 
         // Die if result is invalid.
         $r       = $this->executeSql($SQL);
-        $columns = $r->fetch_all();
+        $columns = array();
+        while ($row = $r->fetch_array()) {
+            $columns[] = array($row['COLUMN_NAME']);
+        }
 
         // Gets a nice array of column names
         $columns = call_user_func_array('array_merge', $columns);
