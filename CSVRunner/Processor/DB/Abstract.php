@@ -155,6 +155,25 @@ abstract class Processor_DB_Abstract
         return $r;
     }
 
+    public function changeColumnCharset($column, $newCharSet)
+    {
+        $def = $this->getColumnDefinition($column);
+        $SQL = 'ALTER TABLE `' . $this->getTableName() .'` MODIFY `' . $column . '` ' . strtoupper($def['type']) . ' CHARACTER SET ' . $newCharSet .';';
+        $this->query($sql);
+        return $this;
+    }
+
+    public function changeColumnCollation($column, $newCollation, $newCharSet = null)
+    {
+        $def = $this->getColumnDefinition($column);
+        if(is_null($newCharSet)) {
+            $newCharSet = explode("_",$newCollation)[0];
+        }
+        $SQL = 'ALTER TABLE `' . $this->getTableName() .'` MODIFY `' . $column . '` ' . strtoupper($def['type']) . ' COLLATE ' . $newCharSet . ' CHARACTER SET ' . $newCharSet .';';
+        $this->query($sql);
+        return $this;
+    }
+
     public function dropColumn($name)
     {
         $sql = "ALTER TABLE `" . $this->getTableName() . "` DROP `" . $name . "`;";
