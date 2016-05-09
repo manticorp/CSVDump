@@ -181,3 +181,28 @@ For the add/modifyColumn usage, I suggest looking either at the [example process
 Using the processor is simple, just select it in the 'Processor' dropdown box and run the dump as normal:
 
 ![Using a Processor](http://i.imgur.com/IoY3dog.png)
+
+# Frequently Asked Questions
+
+## My CSV file won't import
+
+[Don't use excel](http://stackoverflow.com/questions/4221176/excel-to-csv-with-utf8-encoding)
+
+## UTF8 characters don't import correctly
+
+[Don't use excel](http://stackoverflow.com/questions/4221176/excel-to-csv-with-utf8-encoding)
+
+## I'm getting a problem with LOAD DATA LOCAL INFILE in mysql
+
+You need to make sure LOAD DATA LOCAL is enabled in your installation.
+
+CSVDump is inherently insecure and shouldn't be used in production environments, so enabling LOAD DATA LOCAL should be fine.
+
+http://dev.mysql.com/doc/refman/5.7/en/load-data-local.html
+
+## I'm getting XYZ mysql errors
+
+Try using the mysqlnd drivers for PHP:
+
+http://php.net/manual/en/book.mysqlnd.php
+http://stackoverflow.com/questions/13159518/how-to-enable-mysqlnd-for-php

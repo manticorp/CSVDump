@@ -107,6 +107,8 @@ class CSVRunner {
         // Register a shutdown function to handle any errors that cause quitting or early termination,
         // including timeouts and anything that doesn't trigger errors.
         register_shutdown_function('shutdown');
+
+        mb_internal_encoding('UTF-8');
         return $this;
     }
 
